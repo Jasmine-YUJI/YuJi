@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>com.yuji</groupId>
+        <artifactId>yuji</artifactId>
+        <version>3.6.4</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <modules>
+        <module>yuji-common-log</module>
+        <module>yuji-common-core</module>
+        <module>yuji-common-redis</module>
+        <module>yuji-common-seata</module>
+        <module>yuji-common-swagger</module>
+        <module>yuji-common-security</module>
+        <module>yuji-common-sensitive</module>
+        <module>yuji-common-datascope</module>
+        <module>yuji-common-datasource</module>
+    </modules>
+
+    <artifactId>yuji-common</artifactId>
+    <packaging>pom</packaging>
+
+    <description>
+        yuji-common通用模块
+    </description>
+
+</project>

@@ -1,0 +1,2 @@
+com.yuji.common.log.service.AsyncLogService
+com.yuji.common.log.aspect.LogAspect
