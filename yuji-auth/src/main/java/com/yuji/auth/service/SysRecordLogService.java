@@ -1,5 +1,8 @@
 package com.yuji.auth.service;
 
+import com.yuji.common.core.utils.IP2RegionUtils;
+import com.yuji.common.core.utils.ServletUtils;
+import eu.bitwalker.useragentutils.UserAgent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.yuji.common.core.constant.Constants;
@@ -30,9 +33,17 @@ public class SysRecordLogService
      */
     public void recordLogininfor(String username, String status, String message)
     {
+        UserAgent userAgent = UserAgent.parseUserAgentString(ServletUtils.getUserAgent());
+        // 获取客户端操作系统
+        String os = userAgent.getOperatingSystem().getName();
+        // 获取客户端浏览器
+        String browser = userAgent.getBrowser().getName();
         SysLogininfor logininfor = new SysLogininfor();
         logininfor.setUserName(username);
         logininfor.setIpaddr(IpUtils.getIpAddr());
+        logininfor.setLoginLocation(IP2RegionUtils.ip2Region(IpUtils.getIpAddr()));
+        logininfor.setBrowser(browser);
+        logininfor.setOs(os);
         logininfor.setMsg(message);
         // 日志状态
         if (StringUtils.equalsAny(status, Constants.LOGIN_SUCCESS, Constants.LOGOUT, Constants.REGISTER))

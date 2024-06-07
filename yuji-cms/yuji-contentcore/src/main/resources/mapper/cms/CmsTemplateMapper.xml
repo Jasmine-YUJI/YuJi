@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuji.contentcore.mapper.CmsTemplateMapper">
+    
+    <resultMap type="CmsTemplate" id="CmsTemplateResult">
+        <result property="templateId"    column="template_id"    />
+        <result property="siteId"    column="site_id"    />
+        <result property="publishPipeCode"    column="publish_pipe_code"    />
+        <result property="path"    column="path"    />
+        <result property="content"    column="content"    />
+        <result property="filesize"    column="filesize"    />
+        <result property="modifyTime"    column="modify_time"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectCmsTemplateVo">
+        select template_id, site_id, publish_pipe_code, path, content, filesize, modify_time, create_by, create_time, update_by, update_time, remark from cms_template
+    </sql>
+
+    <select id="selectCmsTemplateList" parameterType="CmsTemplate" resultMap="CmsTemplateResult">
+        <include refid="selectCmsTemplateVo"/>
+        <where>  
+            <if test="siteId != null "> and site_id = #{siteId}</if>
+            <if test="publishPipeCode != null  and publishPipeCode != ''"> and publish_pipe_code = #{publishPipeCode}</if>
+            <if test="path != null  and path != ''"> and path = #{path}</if>
+            <if test="content != null  and content != ''"> and content = #{content}</if>
+            <if test="filesize != null "> and filesize = #{filesize}</if>
+            <if test="modifyTime != null "> and modify_time = #{modifyTime}</if>
+        </where>
+    </select>
+    
+    <select id="selectCmsTemplateByTemplateId" parameterType="Long" resultMap="CmsTemplateResult">
+        <include refid="selectCmsTemplateVo"/>
+        where template_id = #{templateId}
+    </select>
+        
+    <insert id="insertCmsTemplate" parameterType="CmsTemplate">
+        insert into cms_template
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="templateId != null">template_id,</if>
+            <if test="siteId != null">site_id,</if>
+            <if test="publishPipeCode != null and publishPipeCode != ''">publish_pipe_code,</if>
+            <if test="path != null and path != ''">path,</if>
+            <if test="content != null and content != ''">content,</if>
+            <if test="filesize != null">filesize,</if>
+            <if test="modifyTime != null">modify_time,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="templateId != null">#{templateId},</if>
+            <if test="siteId != null">#{siteId},</if>
+            <if test="publishPipeCode != null and publishPipeCode != ''">#{publishPipeCode},</if>
+            <if test="path != null and path != ''">#{path},</if>
+            <if test="content != null and content != ''">#{content},</if>
+            <if test="filesize != null">#{filesize},</if>
+            <if test="modifyTime != null">#{modifyTime},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCmsTemplate" parameterType="CmsTemplate">
+        update cms_template
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="siteId != null">site_id = #{siteId},</if>
+            <if test="publishPipeCode != null and publishPipeCode != ''">publish_pipe_code = #{publishPipeCode},</if>
+            <if test="path != null and path != ''">path = #{path},</if>
+            <if test="content != null and content != ''">content = #{content},</if>
+            <if test="filesize != null">filesize = #{filesize},</if>
+            <if test="modifyTime != null">modify_time = #{modifyTime},</if>
+            <if test="createBy != null and createBy != ''">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where template_id = #{templateId}
+    </update>
+
+    <delete id="deleteCmsTemplateByTemplateId" parameterType="Long">
+        delete from cms_template where template_id = #{templateId}
+    </delete>
+
+    <delete id="deleteCmsTemplateByTemplateIds" parameterType="String">
+        delete from cms_template where template_id in 
+        <foreach item="templateId" collection="array" open="(" separator="," close=")">
+            #{templateId}
+        </foreach>
+    </delete>
+</mapper>

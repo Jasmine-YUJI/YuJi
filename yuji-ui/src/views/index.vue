@@ -12,7 +12,7 @@
 
 <script>
 
-import SysUserInfo from '@/views/system/dashboard/userInfo'
+import SysUserInfo from '@/views/dashboard/userInfo'
 
 export default {
   name: 'Index',

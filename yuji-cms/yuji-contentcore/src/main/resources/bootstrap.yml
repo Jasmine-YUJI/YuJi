@@ -1,0 +1,45 @@
+# Tomcat
+server:
+  port: 9203
+
+# Spring
+spring:
+  application:
+    # 应用名称
+    name: yuji-cms
+  profiles:
+    # 环境配置
+    active: dev
+  cloud:
+    nacos:
+      discovery:
+        # 服务注册地址
+        server-addr: 127.0.0.1:8848
+      config:
+        # 配置中心地址
+        server-addr: 127.0.0.1:8848
+        # 配置文件格式
+        file-extension: yml
+        # 共享配置
+        shared-configs:
+          - application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+# 项目相关配置
+yuji:
+    # 名称
+  name: 雨霁内容管理系统
+  # 代号
+  alias: YUJI
+  # 版本
+  version: 1.4.4
+  # 版权年份
+  copyrightYear: 2022-2024
+  freemarker:
+    templateLoaderPath: E:\yujicms\statics
+  cms:
+    resourceRoot: E:\yujicms\yuji-cms-wwwroot
+    publish:
+      consumerCount: 1
+# 日志配置
+logging:
+  level:
+    cn.yuji: debug

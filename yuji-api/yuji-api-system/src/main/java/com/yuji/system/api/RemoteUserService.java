@@ -1,11 +1,7 @@
 package com.yuji.system.api;
 
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.*;
 import com.yuji.common.core.constant.SecurityConstants;
 import com.yuji.common.core.constant.ServiceNameConstants;
 import com.yuji.common.core.domain.R;
@@ -40,4 +36,14 @@ public interface RemoteUserService
      */
     @PostMapping("/user/register")
     public R<Boolean> registerUserInfo(@RequestBody SysUser sysUser, @RequestHeader(SecurityConstants.FROM_SOURCE) String source);
+
+    /**
+     * 修改用户
+     *
+     * @param sysUser 用户信息
+     * @param source 请求来源
+     * @return 结果
+     */
+    @PostMapping("/user/editUserInfo")
+    public R<Boolean> editUserInfo(@RequestBody SysUser sysUser, @RequestHeader(SecurityConstants.FROM_SOURCE) String source);
 }

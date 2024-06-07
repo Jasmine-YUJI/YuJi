@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuji.contentcore.mapper.CmsSitePropertyMapper">
+    
+    <resultMap type="CmsSiteProperty" id="CmsSitePropertyResult">
+        <result property="propertyId"    column="property_id"    />
+        <result property="siteId"    column="site_id"    />
+        <result property="propName"    column="prop_name"    />
+        <result property="propCode"    column="prop_code"    />
+        <result property="propValue"    column="prop_value"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectCmsSitePropertyVo">
+        select property_id, site_id, prop_name, prop_code, prop_value, create_by, create_time, update_by, update_time, remark from cms_site_property
+    </sql>
+
+    <select id="selectCmsSitePropertyList" parameterType="CmsSiteProperty" resultMap="CmsSitePropertyResult">
+        <include refid="selectCmsSitePropertyVo"/>
+        <where>  
+            <if test="siteId != null "> and site_id = #{siteId}</if>
+            <if test="propName != null  and propName != ''"> and prop_name like concat('%', #{propName}, '%')</if>
+            <if test="propCode != null  and propCode != ''"> and prop_code = #{propCode}</if>
+            <if test="propValue != null  and propValue != ''"> and prop_value = #{propValue}</if>
+        </where>
+    </select>
+    
+    <select id="selectCmsSitePropertyByPropertyId" parameterType="Long" resultMap="CmsSitePropertyResult">
+        <include refid="selectCmsSitePropertyVo"/>
+        where property_id = #{propertyId}
+    </select>
+        
+    <insert id="insertCmsSiteProperty" parameterType="CmsSiteProperty">
+        insert into cms_site_property
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="propertyId != null">property_id,</if>
+            <if test="siteId != null">site_id,</if>
+            <if test="propName != null and propName != ''">prop_name,</if>
+            <if test="propCode != null and propCode != ''">prop_code,</if>
+            <if test="propValue != null">prop_value,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="propertyId != null">#{propertyId},</if>
+            <if test="siteId != null">#{siteId},</if>
+            <if test="propName != null and propName != ''">#{propName},</if>
+            <if test="propCode != null and propCode != ''">#{propCode},</if>
+            <if test="propValue != null">#{propValue},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCmsSiteProperty" parameterType="CmsSiteProperty">
+        update cms_site_property
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="siteId != null">site_id = #{siteId},</if>
+            <if test="propName != null and propName != ''">prop_name = #{propName},</if>
+            <if test="propCode != null and propCode != ''">prop_code = #{propCode},</if>
+            <if test="propValue != null">prop_value = #{propValue},</if>
+            <if test="createBy != null and createBy != ''">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where property_id = #{propertyId}
+    </update>
+
+    <delete id="deleteCmsSitePropertyByPropertyId" parameterType="Long">
+        delete from cms_site_property where property_id = #{propertyId}
+    </delete>
+
+    <delete id="deleteCmsSitePropertyByPropertyIds" parameterType="String">
+        delete from cms_site_property where property_id in 
+        <foreach item="propertyId" collection="array" open="(" separator="," close=")">
+            #{propertyId}
+        </foreach>
+    </delete>
+</mapper>

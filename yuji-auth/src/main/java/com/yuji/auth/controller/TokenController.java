@@ -36,7 +36,6 @@ public class TokenController
     @PostMapping("login")
     public R<?> login(@RequestBody LoginBody form) throws Exception {
         // 用户登录
-        String aa = RsaUtils.decryptByPrivateKey(form.getPassword());
         LoginUser userInfo = sysLoginService.login(form.getUsername(), RsaUtils.decryptByPrivateKey(form.getPassword()));
         // 获取登录token
         return R.ok(tokenService.createToken(userInfo));

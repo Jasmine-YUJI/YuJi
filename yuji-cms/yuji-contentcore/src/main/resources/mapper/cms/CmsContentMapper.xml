@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuji.contentcore.mapper.CmsContentMapper">
+    
+    <resultMap type="CmsContent" id="CmsContentResult">
+        <result property="contentId"            column="content_id"         />
+        <result property="siteId"               column="site_id"            />
+        <result property="catalogId"            column="catalog_id"         />
+        <result property="catalogAncestors"     column="catalog_ancestors"  />
+        <result property="topCatalog"           column="top_catalog"        />
+        <result property="deptId"               column="dept_id"            />
+        <result property="deptCode"             column="dept_code"          />
+        <result property="contentType"          column="content_type"       />
+        <result property="title"                column="title"              />
+        <result property="subTitle"             column="sub_title"          />
+        <result property="shortTitle"           column="short_title"        />
+        <result property="titleStyle"           column="title_style"        />
+        <result property="logo"                 column="logo"               />
+        <result property="source"               column="source"             />
+        <result property="sourceUrl"            column="source_url"         />
+        <result property="original"             column="original"           />
+        <result property="author"               column="author"             />
+        <result property="editor"               column="editor"             />
+        <result property="summary"              column="summary"            />
+        <result property="staticPath"           column="static_path"        />
+        <result property="status"               column="status"             />
+        <result property="attributes"           column="attributes"         />
+        <result property="topFlag"              column="top_flag"           />
+        <result property="topDate"              column="top_date"           />
+        <result property="sortFlag"             column="sort_flag"          />
+        <result property="keywords"             column="keywords"           typeHandler="com.yuji.contentcore.utils.JsonTypeHandler"    />
+        <result property="tags"                 column="tags"               typeHandler="com.yuji.contentcore.utils.JsonTypeHandler"   />
+        <result property="copyType"             column="copy_type"          />
+        <result property="copyId"               column="copy_id"            />
+        <result property="publishDate"          column="publish_date"       />
+        <result property="offlineDate"          column="offline_date"       />
+        <result property="publishPipe"          column="publish_pipe"       typeHandler="com.yuji.contentcore.utils.JsonTypeHandler"/>
+        <result property="publishPipeProps"     column="publish_pipe_props" typeHandler="com.yuji.contentcore.utils.JsonTypeHandler"/>
+        <result property="linkFlag"             column="link_flag"          />
+        <result property="redirectUrl"          column="redirect_url"       />
+        <result property="isLock"               column="is_lock"            />
+        <result property="lockUser"             column="lock_user"          />
+        <result property="configProps"          column="config_props"       typeHandler="com.yuji.contentcore.utils.JsonTypeHandler"/>
+        <result property="deleted"              column="deleted"            />
+        <result property="createBy"             column="create_by"          />
+        <result property="createTime"           column="create_time"        />
+        <result property="updateBy"             column="update_by"          />
+        <result property="updateTime"           column="update_time"        />
+        <result property="remark"               column="remark"             />
+        <result property="likeCount"            column="like_count"         />
+        <result property="commentCount"         column="comment_count"      />
+        <result property="favoriteCount"        column="favorite_count"     />
+        <result property="viewCount"            column="view_count"         />
+        <result property="contributorId"        column="contributor_id"     />
+        <result property="seoTitle"             column="seo_title"          />
+        <result property="seoKeywords"          column="seo_keywords"       />
+        <result property="seoDescription"       column="seo_description"    />
+    </resultMap>
+
+    <sql id="selectCmsContentVo">
+        select content_id, site_id, catalog_id, catalog_ancestors, top_catalog, dept_id, dept_code, content_type, title, sub_title, short_title, title_style, logo, source, source_url, original, author, editor, summary, static_path, status, attributes, top_flag, top_date, sort_flag, keywords, tags, copy_type, copy_id, publish_date, offline_date, publish_pipe, publish_pipe_props, link_flag, redirect_url, is_lock, lock_user, config_props, deleted, create_by, create_time, update_by, update_time, remark, like_count, comment_count, favorite_count, view_count, contributor_id, seo_title, seo_keywords, seo_description from cms_content
+    </sql>
+
+    <select id="selectCmsContentList" parameterType="CmsContent" resultMap="CmsContentResult">
+        <include refid="selectCmsContentVo"/>
+        <where>  
+            <if test="siteId != null "> and site_id = #{siteId}</if>
+            <if test="catalogId != null "> and catalog_id = #{catalogId}</if>
+            <if test="catalogAncestors != null  and catalogAncestors != ''"> and catalog_ancestors = #{catalogAncestors}</if>
+            <if test="topCatalog != null "> and top_catalog = #{topCatalog}</if>
+            <if test="deptId != null "> and dept_id = #{deptId}</if>
+            <if test="deptCode != null  and deptCode != ''"> and dept_code = #{deptCode}</if>
+            <if test="contentType != null  and contentType != ''"> and content_type = #{contentType}</if>
+            <if test="title != null  and title != ''"> and title = #{title}</if>
+            <if test="subTitle != null  and subTitle != ''"> and sub_title = #{subTitle}</if>
+            <if test="shortTitle != null  and shortTitle != ''"> and short_title = #{shortTitle}</if>
+            <if test="titleStyle != null  and titleStyle != ''"> and title_style = #{titleStyle}</if>
+            <if test="logo != null  and logo != ''"> and logo = #{logo}</if>
+            <if test="source != null  and source != ''"> and source = #{source}</if>
+            <if test="sourceUrl != null  and sourceUrl != ''"> and source_url = #{sourceUrl}</if>
+            <if test="original != null  and original != ''"> and original = #{original}</if>
+            <if test="author != null  and author != ''"> and author = #{author}</if>
+            <if test="editor != null  and editor != ''"> and editor = #{editor}</if>
+            <if test="summary != null  and summary != ''"> and summary = #{summary}</if>
+            <if test="staticPath != null  and staticPath != ''"> and static_path = #{staticPath}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+            <if test="attributes != null "> and attributes = #{attributes}</if>
+            <if test="topFlag != null "> and top_flag = #{topFlag}</if>
+            <if test="topDate != null "> and top_date = #{topDate}</if>
+            <if test="sortFlag != null "> and sort_flag = #{sortFlag}</if>
+            <if test="keywords != null  and keywords != ''"> and keywords = #{keywords}</if>
+            <if test="tags != null  and tags != ''"> and tags = #{tags}</if>
+            <if test="copyType != null "> and copy_type = #{copyType}</if>
+            <if test="copyId != null "> and copy_id = #{copyId}</if>
+            <if test="publishDate != null "> and publish_date = #{publishDate}</if>
+            <if test="offlineDate != null "> and offline_date = #{offlineDate}</if>
+            <if test="publishPipe != null  and publishPipe != ''"> and publish_pipe = #{publishPipe}</if>
+            <if test="publishPipeProps != null  and publishPipeProps != ''"> and publish_pipe_props = #{publishPipeProps}</if>
+            <if test="linkFlag != null  and linkFlag != ''"> and link_flag = #{linkFlag}</if>
+            <if test="redirectUrl != null  and redirectUrl != ''"> and redirect_url = #{redirectUrl}</if>
+            <if test="isLock != null  and isLock != ''"> and is_lock = #{isLock}</if>
+            <if test="lockUser != null  and lockUser != ''"> and lock_user = #{lockUser}</if>
+            <if test="configProps != null  and configProps != ''"> and config_props = #{configProps}</if>
+            <if test="deleted != null "> and deleted = #{deleted}</if>
+            <if test="likeCount != null "> and like_count = #{likeCount}</if>
+            <if test="commentCount != null "> and comment_count = #{commentCount}</if>
+            <if test="favoriteCount != null "> and favorite_count = #{favoriteCount}</if>
+            <if test="viewCount != null "> and view_count = #{viewCount}</if>
+            <if test="contributorId != null "> and contributor_id = #{contributorId}</if>
+            <if test="seoTitle != null  and seoTitle != ''"> and seo_title = #{seoTitle}</if>
+            <if test="seoKeywords != null  and seoKeywords != ''"> and seo_keywords = #{seoKeywords}</if>
+            <if test="seoDescription != null  and seoDescription != ''"> and seo_description = #{seoDescription}</if>
+        </where>
+    </select>
+    
+    <select id="selectCmsContentByContentId" parameterType="Long" resultMap="CmsContentResult">
+        <include refid="selectCmsContentVo"/>
+        where content_id = #{contentId}
+    </select>
+
+    <select id="selectCmsContentByContentIdInList" parameterType="String" resultMap="CmsContentResult">
+        <include refid="selectCmsContentVo"/>
+        where content_id in
+        <foreach item="contentId" collection="array" open="(" separator="," close=")">
+            #{contentId}
+        </foreach>
+    </select>
+
+
+        
+    <insert id="insertCmsContent" parameterType="CmsContent">
+        insert into cms_content
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="contentId != null">content_id,</if>
+            <if test="siteId != null">site_id,</if>
+            <if test="catalogId != null">catalog_id,</if>
+            <if test="catalogAncestors != null and catalogAncestors != ''">catalog_ancestors,</if>
+            <if test="topCatalog != null">top_catalog,</if>
+            <if test="deptId != null">dept_id,</if>
+            <if test="deptCode != null">dept_code,</if>
+            <if test="contentType != null and contentType != ''">content_type,</if>
+            <if test="title != null and title != ''">title,</if>
+            <if test="subTitle != null">sub_title,</if>
+            <if test="shortTitle != null">short_title,</if>
+            <if test="titleStyle != null">title_style,</if>
+            <if test="logo != null">logo,</if>
+            <if test="source != null">source,</if>
+            <if test="sourceUrl != null">source_url,</if>
+            <if test="original != null and original != ''">original,</if>
+            <if test="author != null">author,</if>
+            <if test="editor != null">editor,</if>
+            <if test="summary != null">summary,</if>
+            <if test="staticPath != null">static_path,</if>
+            <if test="status != null and status != ''">status,</if>
+            <if test="attributes != null">attributes,</if>
+            <if test="topFlag != null">top_flag,</if>
+            <if test="topDate != null">top_date,</if>
+            <if test="sortFlag != null">sort_flag,</if>
+            <if test="keywords != null">keywords,</if>
+            <if test="tags != null">tags,</if>
+            <if test="copyType != null">copy_type,</if>
+            <if test="copyId != null">copy_id,</if>
+            <if test="publishDate != null">publish_date,</if>
+            <if test="offlineDate != null">offline_date,</if>
+            <if test="publishPipe != null">publish_pipe,</if>
+            <if test="publishPipeProps != null">publish_pipe_props,</if>
+            <if test="linkFlag != null and linkFlag != ''">link_flag,</if>
+            <if test="redirectUrl != null">redirect_url,</if>
+            <if test="isLock != null and isLock != ''">is_lock,</if>
+            <if test="lockUser != null">lock_user,</if>
+            <if test="configProps != null">config_props,</if>
+            <if test="deleted != null">deleted,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+            <if test="likeCount != null">like_count,</if>
+            <if test="commentCount != null">comment_count,</if>
+            <if test="favoriteCount != null">favorite_count,</if>
+            <if test="viewCount != null">view_count,</if>
+            <if test="contributorId != null">contributor_id,</if>
+            <if test="seoTitle != null">seo_title,</if>
+            <if test="seoKeywords != null">seo_keywords,</if>
+            <if test="seoDescription != null">seo_description,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="contentId != null">#{contentId},</if>
+            <if test="siteId != null">#{siteId},</if>
+            <if test="catalogId != null">#{catalogId},</if>
+            <if test="catalogAncestors != null and catalogAncestors != ''">#{catalogAncestors},</if>
+            <if test="topCatalog != null">#{topCatalog},</if>
+            <if test="deptId != null">#{deptId},</if>
+            <if test="deptCode != null">#{deptCode},</if>
+            <if test="contentType != null and contentType != ''">#{contentType},</if>
+            <if test="title != null and title != ''">#{title},</if>
+            <if test="subTitle != null">#{subTitle},</if>
+            <if test="shortTitle != null">#{shortTitle},</if>
+            <if test="titleStyle != null">#{titleStyle},</if>
+            <if test="logo != null">#{logo},</if>
+            <if test="source != null">#{source},</if>
+            <if test="sourceUrl != null">#{sourceUrl},</if>
+            <if test="original != null and original != ''">#{original},</if>
+            <if test="author != null">#{author},</if>
+            <if test="editor != null">#{editor},</if>
+            <if test="summary != null">#{summary},</if>
+            <if test="staticPath != null">#{staticPath},</if>
+            <if test="status != null and status != ''">#{status},</if>
+            <if test="attributes != null">#{attributes},</if>
+            <if test="topFlag != null">#{topFlag},</if>
+            <if test="topDate != null">#{topDate},</if>
+            <if test="sortFlag != null">#{sortFlag},</if>
+            <if test="keywords != null">#{keywords},</if>
+            <if test="tags != null">#{tags},</if>
+            <if test="copyType != null">#{copyType},</if>
+            <if test="copyId != null">#{copyId},</if>
+            <if test="publishDate != null">#{publishDate},</if>
+            <if test="offlineDate != null">#{offlineDate},</if>
+            <if test="publishPipe != null">#{publishPipe},</if>
+            <if test="publishPipeProps != null">#{publishPipeProps},</if>
+            <if test="linkFlag != null and linkFlag != ''">#{linkFlag},</if>
+            <if test="redirectUrl != null">#{redirectUrl},</if>
+            <if test="isLock != null and isLock != ''">#{isLock},</if>
+            <if test="lockUser != null">#{lockUser},</if>
+            <if test="configProps != null">#{configProps},</if>
+            <if test="deleted != null">#{deleted},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="likeCount != null">#{likeCount},</if>
+            <if test="commentCount != null">#{commentCount},</if>
+            <if test="favoriteCount != null">#{favoriteCount},</if>
+            <if test="viewCount != null">#{viewCount},</if>
+            <if test="contributorId != null">#{contributorId},</if>
+            <if test="seoTitle != null">#{seoTitle},</if>
+            <if test="seoKeywords != null">#{seoKeywords},</if>
+            <if test="seoDescription != null">#{seoDescription},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCmsContent" parameterType="CmsContent">
+        update cms_content
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="siteId != null">site_id = #{siteId},</if>
+            <if test="catalogId != null">catalog_id = #{catalogId},</if>
+            <if test="catalogAncestors != null and catalogAncestors != ''">catalog_ancestors = #{catalogAncestors},</if>
+            <if test="topCatalog != null">top_catalog = #{topCatalog},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="deptCode != null">dept_code = #{deptCode},</if>
+            <if test="contentType != null and contentType != ''">content_type = #{contentType},</if>
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="subTitle != null">sub_title = #{subTitle},</if>
+            <if test="shortTitle != null">short_title = #{shortTitle},</if>
+            <if test="titleStyle != null">title_style = #{titleStyle},</if>
+            <if test="logo != null">logo = #{logo},</if>
+            <if test="source != null">source = #{source},</if>
+            <if test="sourceUrl != null">source_url = #{sourceUrl},</if>
+            <if test="original != null and original != ''">original = #{original},</if>
+            <if test="author != null">author = #{author},</if>
+            <if test="editor != null">editor = #{editor},</if>
+            <if test="summary != null">summary = #{summary},</if>
+            <if test="staticPath != null">static_path = #{staticPath},</if>
+            <if test="status != null and status != ''">status = #{status},</if>
+            <if test="attributes != null">attributes = #{attributes},</if>
+            <if test="topFlag != null">top_flag = #{topFlag},</if>
+            <if test="topDate != null">top_date = #{topDate},</if>
+            <if test="sortFlag != null">sort_flag = #{sortFlag},</if>
+            <if test="keywords != null">keywords = #{keywords},</if>
+            <if test="tags != null">tags = #{tags},</if>
+            <if test="copyType != null">copy_type = #{copyType},</if>
+            <if test="copyId != null">copy_id = #{copyId},</if>
+            <if test="publishDate != null">publish_date = #{publishDate},</if>
+            <if test="offlineDate != null">offline_date = #{offlineDate},</if>
+            <if test="publishPipe != null">publish_pipe = #{publishPipe},</if>
+            <if test="publishPipeProps != null">publish_pipe_props = #{publishPipeProps},</if>
+            <if test="linkFlag != null and linkFlag != ''">link_flag = #{linkFlag},</if>
+            <if test="redirectUrl != null">redirect_url = #{redirectUrl},</if>
+            <if test="isLock != null and isLock != ''">is_lock = #{isLock},</if>
+            <if test="lockUser != null">lock_user = #{lockUser},</if>
+            <if test="configProps != null">config_props = #{configProps},</if>
+            <if test="deleted != null">deleted = #{deleted},</if>
+            <if test="createBy != null and createBy != ''">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="likeCount != null">like_count = #{likeCount},</if>
+            <if test="commentCount != null">comment_count = #{commentCount},</if>
+            <if test="favoriteCount != null">favorite_count = #{favoriteCount},</if>
+            <if test="viewCount != null">view_count = #{viewCount},</if>
+            <if test="contributorId != null">contributor_id = #{contributorId},</if>
+            <if test="seoTitle != null">seo_title = #{seoTitle},</if>
+            <if test="seoKeywords != null">seo_keywords = #{seoKeywords},</if>
+            <if test="seoDescription != null">seo_description = #{seoDescription},</if>
+        </trim>
+        where content_id = #{contentId}
+    </update>
+
+    <delete id="deleteCmsContentByContentId" parameterType="Long">
+        delete from cms_content where content_id = #{contentId}
+    </delete>
+
+    <delete id="deleteCmsContentByContentIds" parameterType="String">
+        delete from cms_content where content_id in 
+        <foreach item="contentId" collection="array" open="(" separator="," close=")">
+            #{contentId}
+        </foreach>
+    </delete>
+</mapper>

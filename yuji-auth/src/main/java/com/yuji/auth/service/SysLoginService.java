@@ -1,5 +1,6 @@
 package com.yuji.auth.service;
 
+import com.yuji.common.core.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.yuji.common.core.constant.CacheConstants;
@@ -17,6 +18,8 @@ import com.yuji.common.security.utils.SecurityUtils;
 import com.yuji.system.api.RemoteUserService;
 import com.yuji.system.api.domain.SysUser;
 import com.yuji.system.api.model.LoginUser;
+
+import java.time.LocalDateTime;
 
 /**
  * 登录校验方法
@@ -96,6 +99,9 @@ public class SysLoginService
             recordLogService.recordLogininfor(username, Constants.LOGIN_FAIL, "用户已停用，请联系管理员");
             throw new ServiceException("对不起，您的账号：" + username + " 已停用");
         }
+        user.setLoginIp(IpUtils.getIpAddr());
+        user.setLoginDate(LocalDateTime.now());
+        remoteUserService.editUserInfo(user, SecurityConstants.INNER);
         passwordService.validate(user, password);
         recordLogService.recordLogininfor(username, Constants.LOGIN_SUCCESS, "登录成功");
         return userInfo;

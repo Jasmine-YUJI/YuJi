@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuji.contentcore.mapper.CmsCatalogMapper">
+    
+    <resultMap type="CmsCatalog" id="CmsCatalogResult">
+        <result property="catalogId"    column="catalog_id"    />
+        <result property="siteId"    column="site_id"    />
+        <result property="parentId"    column="parent_id"    />
+        <result property="name"    column="name"    />
+        <result property="logo"    column="logo"    />
+        <result property="alias"    column="alias"    />
+        <result property="description"    column="description"    />
+        <result property="ancestors"    column="ancestors"    />
+        <result property="deptCode"    column="dept_code"    />
+        <result property="catalogType"    column="catalog_type"    />
+        <result property="path"    column="path"    />
+        <result property="redirectUrl"    column="redirect_url"    />
+        <result property="staticFlag"    column="static_flag"    />
+        <result property="visibleFlag"    column="visible_flag"    />
+        <result property="sortFlag"    column="sort_flag"    />
+        <result property="indexTemplate"    column="index_template"    />
+        <result property="indexFileName"    column="index_file_name"    />
+        <result property="listTemplate"    column="list_template"    />
+        <result property="listNameRule"    column="list_name_rule"    />
+        <result property="detailTemplate"    column="detail_template"    />
+        <result property="detailNameRule"    column="detail_name_rule"    />
+        <result property="treeLevel"    column="tree_level"    />
+        <result property="childCount"    column="child_count"    />
+        <result property="contentCount"    column="content_count"    />
+        <result property="status"    column="status"    />
+        <result property="hitCount"    column="hit_count"    />
+        <result property="seoKeywords"    column="seo_keywords"    />
+        <result property="seoDescription"    column="seo_description"    />
+        <result property="seoTitle"    column="seo_title"    />
+        <result property="publishPipeProps"    column="publish_pipe_props"   typeHandler="com.yuji.contentcore.utils.JsonTypeHandler"   />
+        <result property="configProps"    column="config_props"    typeHandler="com.yuji.contentcore.utils.JsonTypeHandler"   />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectCmsCatalogVo">
+        select catalog_id, site_id, parent_id, name, logo, alias, description, ancestors, dept_code, catalog_type, path, redirect_url, static_flag, visible_flag, sort_flag, index_template, index_file_name, list_template, list_name_rule, detail_template, detail_name_rule, tree_level, child_count, content_count, status, hit_count, seo_keywords, seo_description, seo_title, publish_pipe_props, config_props, create_by, create_time, update_by, update_time, remark from cms_catalog
+    </sql>
+
+    <select id="selectCmsCatalogList" parameterType="CmsCatalog" resultMap="CmsCatalogResult">
+        <include refid="selectCmsCatalogVo"/>
+        <where>  
+            <if test="siteId != null "> and site_id = #{siteId}</if>
+            <if test="parentId != null "> and parent_id = #{parentId}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="logo != null  and logo != ''"> and logo = #{logo}</if>
+            <if test="alias != null  and alias != ''"> and alias = #{alias}</if>
+            <if test="description != null  and description != ''"> and description = #{description}</if>
+            <if test="ancestors != null  and ancestors != ''"> and ancestors = #{ancestors}</if>
+            <if test="deptCode != null  and deptCode != ''"> and dept_code = #{deptCode}</if>
+            <if test="catalogType != null  and catalogType != ''"> and catalog_type = #{catalogType}</if>
+            <if test="path != null  and path != ''"> and path = #{path}</if>
+            <if test="redirectUrl != null  and redirectUrl != ''"> and redirect_url = #{redirectUrl}</if>
+            <if test="staticFlag != null  and staticFlag != ''"> and static_flag = #{staticFlag}</if>
+            <if test="visibleFlag != null  and visibleFlag != ''"> and visible_flag = #{visibleFlag}</if>
+            <if test="sortFlag != null "> and sort_flag = #{sortFlag}</if>
+            <if test="indexTemplate != null  and indexTemplate != ''"> and index_template = #{indexTemplate}</if>
+            <if test="indexFileName != null  and indexFileName != ''"> and index_file_name like concat('%', #{indexFileName}, '%')</if>
+            <if test="listTemplate != null  and listTemplate != ''"> and list_template = #{listTemplate}</if>
+            <if test="listNameRule != null  and listNameRule != ''"> and list_name_rule = #{listNameRule}</if>
+            <if test="detailTemplate != null  and detailTemplate != ''"> and detail_template = #{detailTemplate}</if>
+            <if test="detailNameRule != null  and detailNameRule != ''"> and detail_name_rule = #{detailNameRule}</if>
+            <if test="treeLevel != null "> and tree_level = #{treeLevel}</if>
+            <if test="childCount != null "> and child_count = #{childCount}</if>
+            <if test="contentCount != null "> and content_count = #{contentCount}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+            <if test="hitCount != null "> and hit_count = #{hitCount}</if>
+            <if test="seoKeywords != null  and seoKeywords != ''"> and seo_keywords = #{seoKeywords}</if>
+            <if test="seoDescription != null  and seoDescription != ''"> and seo_description = #{seoDescription}</if>
+            <if test="seoTitle != null  and seoTitle != ''"> and seo_title = #{seoTitle}</if>
+            <if test="publishPipeProps != null  and publishPipeProps != ''"> and publish_pipe_props = #{publishPipeProps}</if>
+            <if test="configProps != null  and configProps != ''"> and config_props = #{configProps}</if>
+        </where>
+    </select>
+    
+    <select id="selectCmsCatalogByCatalogId" parameterType="Long" resultMap="CmsCatalogResult">
+        <include refid="selectCmsCatalogVo"/>
+        where catalog_id = #{catalogId}
+    </select>
+        
+    <insert id="insertCmsCatalog" parameterType="CmsCatalog">
+        insert into cms_catalog
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="catalogId != null">catalog_id,</if>
+            <if test="siteId != null">site_id,</if>
+            <if test="parentId != null">parent_id,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="logo != null">logo,</if>
+            <if test="alias != null and alias != ''">alias,</if>
+            <if test="description != null">description,</if>
+            <if test="ancestors != null">ancestors,</if>
+            <if test="deptCode != null">dept_code,</if>
+            <if test="catalogType != null and catalogType != ''">catalog_type,</if>
+            <if test="path != null and path != ''">path,</if>
+            <if test="redirectUrl != null">redirect_url,</if>
+            <if test="staticFlag != null and staticFlag != ''">static_flag,</if>
+            <if test="visibleFlag != null and visibleFlag != ''">visible_flag,</if>
+            <if test="sortFlag != null">sort_flag,</if>
+            <if test="indexTemplate != null">index_template,</if>
+            <if test="indexFileName != null">index_file_name,</if>
+            <if test="listTemplate != null">list_template,</if>
+            <if test="listNameRule != null">list_name_rule,</if>
+            <if test="detailTemplate != null">detail_template,</if>
+            <if test="detailNameRule != null">detail_name_rule,</if>
+            <if test="treeLevel != null">tree_level,</if>
+            <if test="childCount != null">child_count,</if>
+            <if test="contentCount != null">content_count,</if>
+            <if test="status != null">status,</if>
+            <if test="hitCount != null">hit_count,</if>
+            <if test="seoKeywords != null">seo_keywords,</if>
+            <if test="seoDescription != null">seo_description,</if>
+            <if test="seoTitle != null">seo_title,</if>
+            <if test="publishPipeProps != null">publish_pipe_props,</if>
+            <if test="configProps != null">config_props,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="catalogId != null">#{catalogId},</if>
+            <if test="siteId != null">#{siteId},</if>
+            <if test="parentId != null">#{parentId},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="logo != null">#{logo},</if>
+            <if test="alias != null and alias != ''">#{alias},</if>
+            <if test="description != null">#{description},</if>
+            <if test="ancestors != null">#{ancestors},</if>
+            <if test="deptCode != null">#{deptCode},</if>
+            <if test="catalogType != null and catalogType != ''">#{catalogType},</if>
+            <if test="path != null and path != ''">#{path},</if>
+            <if test="redirectUrl != null">#{redirectUrl},</if>
+            <if test="staticFlag != null and staticFlag != ''">#{staticFlag},</if>
+            <if test="visibleFlag != null and visibleFlag != ''">#{visibleFlag},</if>
+            <if test="sortFlag != null">#{sortFlag},</if>
+            <if test="indexTemplate != null">#{indexTemplate},</if>
+            <if test="indexFileName != null">#{indexFileName},</if>
+            <if test="listTemplate != null">#{listTemplate},</if>
+            <if test="listNameRule != null">#{listNameRule},</if>
+            <if test="detailTemplate != null">#{detailTemplate},</if>
+            <if test="detailNameRule != null">#{detailNameRule},</if>
+            <if test="treeLevel != null">#{treeLevel},</if>
+            <if test="childCount != null">#{childCount},</if>
+            <if test="contentCount != null">#{contentCount},</if>
+            <if test="status != null">#{status},</if>
+            <if test="hitCount != null">#{hitCount},</if>
+            <if test="seoKeywords != null">#{seoKeywords},</if>
+            <if test="seoDescription != null">#{seoDescription},</if>
+            <if test="seoTitle != null">#{seoTitle},</if>
+            <if test="publishPipeProps != null">#{publishPipeProps},</if>
+            <if test="configProps != null">#{configProps},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCmsCatalog" parameterType="CmsCatalog">
+        update cms_catalog
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="siteId != null">site_id = #{siteId},</if>
+            <if test="parentId != null">parent_id = #{parentId},</if>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="logo != null">logo = #{logo},</if>
+            <if test="alias != null and alias != ''">alias = #{alias},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="ancestors != null">ancestors = #{ancestors},</if>
+            <if test="deptCode != null">dept_code = #{deptCode},</if>
+            <if test="catalogType != null and catalogType != ''">catalog_type = #{catalogType},</if>
+            <if test="path != null and path != ''">path = #{path},</if>
+            <if test="redirectUrl != null">redirect_url = #{redirectUrl},</if>
+            <if test="staticFlag != null and staticFlag != ''">static_flag = #{staticFlag},</if>
+            <if test="visibleFlag != null and visibleFlag != ''">visible_flag = #{visibleFlag},</if>
+            <if test="sortFlag != null">sort_flag = #{sortFlag},</if>
+            <if test="indexTemplate != null">index_template = #{indexTemplate},</if>
+            <if test="indexFileName != null">index_file_name = #{indexFileName},</if>
+            <if test="listTemplate != null">list_template = #{listTemplate},</if>
+            <if test="listNameRule != null">list_name_rule = #{listNameRule},</if>
+            <if test="detailTemplate != null">detail_template = #{detailTemplate},</if>
+            <if test="detailNameRule != null">detail_name_rule = #{detailNameRule},</if>
+            <if test="treeLevel != null">tree_level = #{treeLevel},</if>
+            <if test="childCount != null">child_count = #{childCount},</if>
+            <if test="contentCount != null">content_count = #{contentCount},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="hitCount != null">hit_count = #{hitCount},</if>
+            <if test="seoKeywords != null">seo_keywords = #{seoKeywords},</if>
+            <if test="seoDescription != null">seo_description = #{seoDescription},</if>
+            <if test="seoTitle != null">seo_title = #{seoTitle},</if>
+            <if test="publishPipeProps != null">publish_pipe_props = #{publishPipeProps},</if>
+            <if test="configProps != null">config_props = #{configProps},</if>
+            <if test="createBy != null and createBy != ''">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where catalog_id = #{catalogId}
+    </update>
+
+    <delete id="deleteCmsCatalogByCatalogId" parameterType="Long">
+        delete from cms_catalog where catalog_id = #{catalogId}
+    </delete>
+
+    <delete id="deleteCmsCatalogByCatalogIds" parameterType="String">
+        delete from cms_catalog where catalog_id in 
+        <foreach item="catalogId" collection="array" open="(" separator="," close=")">
+            #{catalogId}
+        </foreach>
+    </delete>
+</mapper>

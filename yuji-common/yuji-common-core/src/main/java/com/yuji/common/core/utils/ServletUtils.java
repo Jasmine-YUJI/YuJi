@@ -35,6 +35,11 @@ import reactor.core.publisher.Mono;
 public class ServletUtils
 {
     /**
+     * RequestHeader[User-Agent]
+     */
+    public static final String HEADER_USER_AGENT = "User-Agent";
+
+    /**
      * 获取String参数
      */
     public static String getParameter(String name)
@@ -159,6 +164,9 @@ public class ServletUtils
         {
             return null;
         }
+    }
+    public static String getUserAgent() {
+        return getHeader(getRequest(), HEADER_USER_AGENT);
     }
 
     public static String getHeader(HttpServletRequest request, String name)

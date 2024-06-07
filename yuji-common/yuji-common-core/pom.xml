@@ -122,6 +122,15 @@
             <groupId>com.github.yitter</groupId>
             <artifactId>yitter-idgenerator</artifactId>
         </dependency>
+        <!-- 高速缓存 -->
+        <dependency>
+            <groupId>com.esotericsoftware</groupId>
+            <artifactId>reflectasm</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity-engine-core</artifactId>
+        </dependency>
 
     </dependencies>
 

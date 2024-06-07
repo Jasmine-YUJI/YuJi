@@ -1,9 +1,13 @@
 package com.yuji.common.core.utils.file;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Objects;
+
+import com.yuji.common.core.utils.StringUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -91,5 +95,40 @@ public class FileTypeUtils
             strFileExtendName = "PNG";
         }
         return strFileExtendName;
+    }
+
+    /**
+     * 格式化路径，去掉`../`、`./`等类似路径避免文件泄露
+     *
+     * @param path 路径
+     * @return 格式化路径
+     */
+    public static String normalizePath(String path) {
+        path = path.replace('\\', '/');
+
+        path = StringUtils.replaceEx(path, "../", "/");
+        path = StringUtils.replaceEx(path, "./", "/");
+        path = StringUtils.replaceEx(path, "~/", "/");
+        if (path.endsWith("..")) {
+            path = path.substring(0, path.length() - 2);
+        }
+        path = path.replaceAll("/+", "/");
+        return path;
+    }
+
+    /**
+     * 创建指定路径的目录，包括所有上级目录
+     */
+    public static void mkdirs(String... paths) {
+        if (StringUtils.isEmpty(paths)) {
+            return;
+        }
+        for (String path : paths) {
+            try {
+                Files.createDirectories(Paths.get(path));
+            } catch (IOException e) {
+                throw new RuntimeException("Create directory failed: " + path, e);
+            }
+        }
     }
 }

@@ -149,6 +149,14 @@ public class SysUserController extends BaseController
         return R.ok(userService.registerUser(sysUser));
     }
 
+
+    @InnerAuth
+    @PostMapping("/editUserInfo")
+    public AjaxResult editUserInfo(@Validated @RequestBody SysUser user)
+    {
+        return toAjax(userService.updateUser(user));
+    }
+
     /**
      * 获取用户信息
      * 
@@ -220,6 +228,7 @@ public class SysUserController extends BaseController
      * 修改用户
      */
     @RequiresPermissions("system:user:edit")
+    @InnerAuth
     @Log(title = "用户管理", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody SysUser user)

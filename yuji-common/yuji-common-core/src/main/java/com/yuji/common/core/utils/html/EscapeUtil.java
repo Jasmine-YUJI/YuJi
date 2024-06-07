@@ -39,6 +39,14 @@ public class EscapeUtil
         return encode(text);
     }
 
+    public static String[] escapeArr(String[] arr) {
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = escape(arr[i]);
+        }
+        return arr;
+    }
+
+
     /**
      * 还原被转义的HTML特殊字符
      * 
@@ -60,6 +68,7 @@ public class EscapeUtil
     {
         return new HTMLFilter().filter(content);
     }
+
 
     /**
      * Escape编码

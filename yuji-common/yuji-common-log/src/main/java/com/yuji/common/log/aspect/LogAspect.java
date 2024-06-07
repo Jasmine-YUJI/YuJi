@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.yuji.common.core.utils.IP2RegionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -91,6 +93,7 @@ public class LogAspect
             // 请求的地址
             String ip = IpUtils.getIpAddr();
             operLog.setOperIp(ip);
+            operLog.setOperLocation(IP2RegionUtils.ip2Region(ip));
             operLog.setOperUrl(StringUtils.substring(ServletUtils.getRequest().getRequestURI(), 0, 255));
             String username = SecurityUtils.getUsername();
             if (StringUtils.isNotBlank(username))

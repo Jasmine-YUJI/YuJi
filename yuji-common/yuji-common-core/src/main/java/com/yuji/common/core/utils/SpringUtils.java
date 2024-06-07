@@ -1,11 +1,20 @@
 package com.yuji.common.core.utils;
 
+import com.yuji.common.core.utils.file.FileTypeUtils;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.boot.system.ApplicationHome;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.net.URISyntaxException;
+import java.util.Map;
 
 /**
  * spring工具类 方便在非spring管理环境中获取bean
@@ -13,15 +22,23 @@ import org.springframework.stereotype.Component;
  * @author Liguoqiang
  */
 @Component
-public final class SpringUtils implements BeanFactoryPostProcessor
+public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationContextAware
 {
     /** Spring应用上下文环境 */
     private static ConfigurableListableBeanFactory beanFactory;
+
+    private static ApplicationContext applicationContext;
+
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException
     {
         SpringUtils.beanFactory = beanFactory;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        SpringUtils.applicationContext = applicationContext;
     }
 
     /**
@@ -51,6 +68,11 @@ public final class SpringUtils implements BeanFactoryPostProcessor
         T result = (T) beanFactory.getBean(clz);
         return result;
     }
+
+    public static <T> Map<String, T> getBeanMap(Class<T> claz) {
+        return beanFactory.getBeansOfType(claz);
+    }
+
 
     /**
      * 如果BeanFactory包含一个与所给名称匹配的bean定义，则返回true
@@ -110,5 +132,27 @@ public final class SpringUtils implements BeanFactoryPostProcessor
     public static <T> T getAopProxy(T invoker)
     {
         return (T) AopContext.currentProxy();
+    }
+
+    /**
+     * 获取应用当前所在目录
+     *
+     * @return
+     * @throws FileNotFoundException
+     * @throws URISyntaxException
+     */
+    public static String getAppParentDirectory() {
+        ApplicationHome applicationHome = new ApplicationHome(SpringUtils.class);
+        File applicationDir = applicationHome.getSource();
+        String[] activeProfiles = applicationContext.getEnvironment().getActiveProfiles();
+        if (ArrayUtils.indexOf("dev", activeProfiles) > -1) {
+            String dirPath = FileTypeUtils.normalizePath(applicationHome.getSource().getAbsolutePath());
+            applicationDir = new File(StringUtils.substringBefore(dirPath, "/chestnut-common/"));
+        }
+        String dir = FileTypeUtils.normalizePath(applicationDir.getParentFile().getAbsolutePath());
+        if (dir.indexOf("/BOOT-INF/lib") > -1) {
+            dir = StringUtils.substringBefore(dir, "/BOOT-INF/lib");
+        }
+        return dir;
     }
 }

@@ -161,7 +161,7 @@ public class SysProfileController extends BaseController
     @GetMapping("/homeInfo")
     public R<?> getHomeInfo() {
         LoginUser loginUser = SecurityUtils.getLoginUser();
-        SysUser user = (SysUser) loginUser.getSysUser();
+        SysUser user = loginUser.getSysUser();
         DashboardUserVO vo = new DashboardUserVO();
         vo.setUserName(user.getUserName());
         vo.setNickName(user.getNickName());

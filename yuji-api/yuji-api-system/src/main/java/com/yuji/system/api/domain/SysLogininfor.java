@@ -35,6 +35,18 @@ public class SysLogininfor extends BaseEntity
     @Excel(name = "地址")
     private String ipaddr;
 
+    /** 登录地点 */
+    @Excel(name = "登录地点")
+    private String loginLocation;
+
+    /** 浏览器类型 */
+    @Excel(name = "浏览器")
+    private String browser;
+
+    /** 操作系统 */
+    @Excel(name = "操作系统")
+    private String os;
+
     /** 描述 */
     @Excel(name = "描述")
     private String msg;

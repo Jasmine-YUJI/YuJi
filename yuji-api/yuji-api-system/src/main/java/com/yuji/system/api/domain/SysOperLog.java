@@ -59,8 +59,12 @@ public class SysOperLog extends BaseEntity
     private String operUrl;
 
     /** 操作地址 */
-    @Excel(name = "操作地址")
+    @Excel(name = "IP地址")
     private String operIp;
+
+    /** 操作地址 */
+    @Excel(name = "操作地点")
+    private String operLocation;
 
     /** 请求参数 */
     @Excel(name = "请求参数")

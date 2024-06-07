@@ -106,6 +106,7 @@ export default {
   created() {
     this.getCode();
     this.getCookie();
+    this.getConfig();
   },
   methods: {
     getCode() {
@@ -115,6 +116,11 @@ export default {
           this.codeUrl = "data:image/gif;base64," + res.img;
           this.loginForm.uuid = res.uuid;
         }
+      });
+    },
+    getConfig() {
+      this.getConfigKey("sys.account.registerUser").then(response => {
+        this.register = response.msg;
       });
     },
     getCookie() {

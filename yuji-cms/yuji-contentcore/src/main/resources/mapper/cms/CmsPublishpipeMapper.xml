@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuji.contentcore.mapper.CmsPublishpipeMapper">
+    
+    <resultMap type="CmsPublishpipe" id="CmsPublishpipeResult">
+        <result property="publishpipeId"    column="publishpipe_id"    />
+        <result property="siteId"    column="site_id"    />
+        <result property="name"    column="name"    />
+        <result property="code"    column="code"    />
+        <result property="state"    column="state"    />
+        <result property="sort"    column="sort"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectCmsPublishpipeVo">
+        select publishpipe_id, site_id, name, code, state, sort, create_by, create_time, update_by, update_time, remark from cms_publishpipe
+    </sql>
+
+    <select id="selectCmsPublishpipeList" parameterType="CmsPublishpipe" resultMap="CmsPublishpipeResult">
+        <include refid="selectCmsPublishpipeVo"/>
+        <where>  
+            <if test="siteId != null "> and site_id = #{siteId}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="code != null  and code != ''"> and code = #{code}</if>
+            <if test="state != null  and state != ''"> and state = #{state}</if>
+            <if test="sort != null "> and sort = #{sort}</if>
+        </where>
+    </select>
+    
+    <select id="selectCmsPublishpipeByPublishpipeId" parameterType="Long" resultMap="CmsPublishpipeResult">
+        <include refid="selectCmsPublishpipeVo"/>
+        where publishpipe_id = #{publishpipeId}
+    </select>
+        
+    <insert id="insertCmsPublishpipe" parameterType="CmsPublishpipe">
+        insert into cms_publishpipe
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="publishpipeId != null">publishpipe_id,</if>
+            <if test="siteId != null">site_id,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="code != null and code != ''">code,</if>
+            <if test="state != null and state != ''">state,</if>
+            <if test="sort != null">sort,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="publishpipeId != null">#{publishpipeId},</if>
+            <if test="siteId != null">#{siteId},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="code != null and code != ''">#{code},</if>
+            <if test="state != null and state != ''">#{state},</if>
+            <if test="sort != null">#{sort},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCmsPublishpipe" parameterType="CmsPublishpipe">
+        update cms_publishpipe
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="siteId != null">site_id = #{siteId},</if>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="code != null and code != ''">code = #{code},</if>
+            <if test="state != null and state != ''">state = #{state},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            <if test="createBy != null and createBy != ''">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where publishpipe_id = #{publishpipeId}
+    </update>
+
+    <delete id="deleteCmsPublishpipeByPublishpipeId" parameterType="Long">
+        delete from cms_publishpipe where publishpipe_id = #{publishpipeId}
+    </delete>
+
+    <delete id="deleteCmsPublishpipeByPublishpipeIds" parameterType="String">
+        delete from cms_publishpipe where publishpipe_id in 
+        <foreach item="publishpipeId" collection="array" open="(" separator="," close=")">
+            #{publishpipeId}
+        </foreach>
+    </delete>
+</mapper>

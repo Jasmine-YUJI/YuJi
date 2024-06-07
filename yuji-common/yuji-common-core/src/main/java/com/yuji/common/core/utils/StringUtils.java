@@ -1,8 +1,10 @@
 package com.yuji.common.core.utils;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.text.MessageFormat;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.util.AntPathMatcher;
 import com.yuji.common.core.constant.Constants;
 import com.yuji.common.core.text.StrFormatter;
@@ -17,11 +19,24 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils
     /** 空字符串 */
     private static final String NULLSTR = "";
 
+    /** 点 */
+    public static final String DOT = ".";
+
     /** 下划线 */
     private static final char SEPARATOR = '_';
 
     /** 星号 */
     private static final char ASTERISK = '*';
+
+    /**
+     * 字符常量：斜杠 {@code "/"}
+     */
+    public static final char C_SLASH = '/';
+
+    /**
+     * 字符串常量：斜杠 {@code "/"}
+     */
+    public static final String SLASH = "" + C_SLASH;
 
     /**
      * 获取参数不为空值
@@ -603,5 +618,186 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils
             }
         }
         return sb.toString();
+    }
+
+    /**
+     * 字符串转Map
+     *
+     * @param str
+     * @param entrySpliter
+     * @param keySpliter
+     * @return
+     */
+    public static Map<String, String> splitToMap(String str, String entrySpliter, String keySpliter) {
+        Map<String, String> map = new HashMap<>();
+        if (isEmpty(str)) {
+            return map;
+        }
+        String[] entries = str.split(entrySpliter);
+        for (String entry : entries) {
+            String[] kv = entry.split(keySpliter);
+            String key = kv[0].trim();
+            if (isEmpty(key)) {
+                continue;
+            }
+            map.put(key, kv.length > 1 ? kv[1] : null);
+        }
+        return map;
+    }
+
+    public static String mapToString(Map<String, Object> map, String entrySpliter, String keySpliter) {
+        if (Objects.isNull(map) || map.isEmpty()) {
+            return EMPTY;
+        }
+        return map.entrySet().stream().map(e -> e.getKey() + keySpliter + (Objects.isNull(e.getValue()) ? EMPTY : e.getValue().toString()))
+                .collect(Collectors.joining(entrySpliter));
+    }
+
+    /**
+     * 分隔字符串未字符串数据，并且忽略空字符串
+     *
+     * @param str
+     * @param separator
+     * @return
+     */
+    public static String[] splitIgnoreEmpty(String str, String separator) {
+        if (StringUtils.isBlank(str)) {
+            return ArrayUtils.EMPTY_STRING_ARRAY;
+        }
+        final int len = str.length();
+        final int separatorLength = separator.length();
+
+        final ArrayList<String> substrings = new ArrayList<>();
+        int beg = 0;
+        int end = 0;
+        while (end < len) {
+            end = str.indexOf(separator, beg);
+
+            if (end > -1) {
+                if (end > beg) {
+                    String substr = str.substring(beg, end);
+                    if (substr.length() > 0) {
+                        substrings.add(substr);
+                    }
+                    beg = end + separatorLength;
+                } else {
+                    beg = end + separatorLength;
+                }
+            } else {
+                String substr = str.substring(beg);
+                if (substr.length() > 0) {
+                    substrings.add(substr);
+                }
+                end = len;
+            }
+        }
+
+        return substrings.toArray(ArrayUtils.EMPTY_STRING_ARRAY);
+    }
+
+    /**
+     * MessageFormat.format
+     *
+     * @param message
+     * @param params
+     * @return
+     */
+    public static String messageFormat(String message, Object... params) {
+        if (isBlank(message) || isEmpty(params)) {
+            return message;
+        }
+        return MessageFormat.format(message, params);
+    }
+
+    /**
+     * 首字符转大写
+     *
+     * @param str
+     * @return
+     */
+    public static String upperFirst(String str) {
+        if (isEmpty(str)) {
+            return str;
+        }
+        char firstChar = str.charAt(0);
+        if (Character.isLowerCase(firstChar)) {
+            return Character.toUpperCase(firstChar) + str.substring(1);
+        }
+        return str;
+    }
+
+    /**
+     * 首字符转小写
+     *
+     * @param str
+     * @return
+     */
+    public static String lowerFirst(String str) {
+        if (isEmpty(str)) {
+            return str;
+        }
+        char firstChar = str.charAt(0);
+        if (Character.isUpperCase(firstChar)) {
+            return Character.toLowerCase(firstChar) + str.substring(1);
+        }
+        return str;
+    }
+
+    /**
+     * 将一个字符串中的指定片段全部替换，替换过程中不进行正则处理。<br>
+     *
+     * @param str
+     * @param searchStr
+     * @param replacement
+     * @return
+     */
+    public static String replaceEx(String str, String searchStr, String replacement) {
+        if (str == null || str.length() == 0 || replacement == null) {
+            return str;
+        }
+        if (searchStr == null || searchStr.length() == 0 || searchStr.length() > str.length()) {
+            return str;
+        }
+        StringBuilder sb = null;
+        int lastIndex = 0;
+        while (true) {
+            int index = str.indexOf(searchStr, lastIndex);
+            if (index < 0) {
+                break;
+            } else {
+                if (sb == null) {
+                    sb = new StringBuilder();
+                }
+                sb.append(str.substring(lastIndex, index));
+                sb.append(replacement);
+            }
+            lastIndex = index + searchStr.length();
+        }
+        if (lastIndex == 0) {
+            return str;
+        }
+        sb.append(str.substring(lastIndex));
+        return sb.toString();
+    }
+
+    public static String nullToEmpty(String str) {
+        if (str == null) {
+            return EMPTY;
+        }
+        return str;
+    }
+
+    /**
+     * 返回url路径后的参数集合
+     *
+     * @param path
+     * @return
+     */
+    public static Map<String, String> getPathParameterMap(String path) {
+        if (Objects.isNull(path) || !path.contains("?")) {
+            return Map.of();
+        }
+        String str = substringAfter(path, "?");
+        return splitToMap(str, "&", "=");
     }
 }

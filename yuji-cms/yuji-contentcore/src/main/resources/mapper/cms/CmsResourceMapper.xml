@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yuji.contentcore.mapper.CmsResourceMapper">
+    
+    <resultMap type="CmsResource" id="CmsResourceResult">
+        <result property="resourceId"    column="resource_id"    />
+        <result property="siteId"    column="site_id"    />
+        <result property="resourceType"    column="resource_type"    />
+        <result property="storageType"    column="storage_type"    />
+        <result property="name"    column="name"    />
+        <result property="path"    column="path"    />
+        <result property="fileName"    column="file_name"    />
+        <result property="suffix"    column="suffix"    />
+        <result property="width"    column="width"    />
+        <result property="height"    column="height"    />
+        <result property="fileSize"    column="file_size"    />
+        <result property="sourceUrl"    column="source_url"    />
+        <result property="status"    column="status"    />
+        <result property="usageInfo"    column="usage_info"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectCmsResourceVo">
+        select resource_id, site_id, resource_type, storage_type, name, path, file_name, suffix, width, height, file_size, source_url, status, usage_info, create_by, create_time, update_by, update_time, remark from cms_resource
+    </sql>
+
+    <select id="selectCmsResourceList" parameterType="CmsResource" resultMap="CmsResourceResult">
+        <include refid="selectCmsResourceVo"/>
+        <where>  
+            <if test="siteId != null "> and site_id = #{siteId}</if>
+            <if test="resourceType != null  and resourceType != ''"> and resource_type = #{resourceType}</if>
+            <if test="storageType != null  and storageType != ''"> and storage_type = #{storageType}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="path != null  and path != ''"> and path = #{path}</if>
+            <if test="fileName != null  and fileName != ''"> and file_name like concat('%', #{fileName}, '%')</if>
+            <if test="suffix != null  and suffix != ''"> and suffix = #{suffix}</if>
+            <if test="width != null "> and width = #{width}</if>
+            <if test="height != null "> and height = #{height}</if>
+            <if test="fileSize != null "> and file_size = #{fileSize}</if>
+            <if test="sourceUrl != null  and sourceUrl != ''"> and source_url = #{sourceUrl}</if>
+            <if test="status != null "> and status = #{status}</if>
+            <if test="usageInfo != null  and usageInfo != ''"> and usage_info = #{usageInfo}</if>
+        </where>
+    </select>
+    
+    <select id="selectCmsResourceByResourceId" parameterType="Long" resultMap="CmsResourceResult">
+        <include refid="selectCmsResourceVo"/>
+        where resource_id = #{resourceId}
+    </select>
+        
+    <insert id="insertCmsResource" parameterType="CmsResource">
+        insert into cms_resource
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="resourceId != null">resource_id,</if>
+            <if test="siteId != null">site_id,</if>
+            <if test="resourceType != null and resourceType != ''">resource_type,</if>
+            <if test="storageType != null and storageType != ''">storage_type,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="path != null and path != ''">path,</if>
+            <if test="fileName != null and fileName != ''">file_name,</if>
+            <if test="suffix != null and suffix != ''">suffix,</if>
+            <if test="width != null">width,</if>
+            <if test="height != null">height,</if>
+            <if test="fileSize != null">file_size,</if>
+            <if test="sourceUrl != null">source_url,</if>
+            <if test="status != null">status,</if>
+            <if test="usageInfo != null">usage_info,</if>
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="resourceId != null">#{resourceId},</if>
+            <if test="siteId != null">#{siteId},</if>
+            <if test="resourceType != null and resourceType != ''">#{resourceType},</if>
+            <if test="storageType != null and storageType != ''">#{storageType},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="path != null and path != ''">#{path},</if>
+            <if test="fileName != null and fileName != ''">#{fileName},</if>
+            <if test="suffix != null and suffix != ''">#{suffix},</if>
+            <if test="width != null">#{width},</if>
+            <if test="height != null">#{height},</if>
+            <if test="fileSize != null">#{fileSize},</if>
+            <if test="sourceUrl != null">#{sourceUrl},</if>
+            <if test="status != null">#{status},</if>
+            <if test="usageInfo != null">#{usageInfo},</if>
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateCmsResource" parameterType="CmsResource">
+        update cms_resource
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="siteId != null">site_id = #{siteId},</if>
+            <if test="resourceType != null and resourceType != ''">resource_type = #{resourceType},</if>
+            <if test="storageType != null and storageType != ''">storage_type = #{storageType},</if>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="path != null and path != ''">path = #{path},</if>
+            <if test="fileName != null and fileName != ''">file_name = #{fileName},</if>
+            <if test="suffix != null and suffix != ''">suffix = #{suffix},</if>
+            <if test="width != null">width = #{width},</if>
+            <if test="height != null">height = #{height},</if>
+            <if test="fileSize != null">file_size = #{fileSize},</if>
+            <if test="sourceUrl != null">source_url = #{sourceUrl},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="usageInfo != null">usage_info = #{usageInfo},</if>
+            <if test="createBy != null and createBy != ''">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where resource_id = #{resourceId}
+    </update>
+
+    <delete id="deleteCmsResourceByResourceId" parameterType="Long">
+        delete from cms_resource where resource_id = #{resourceId}
+    </delete>
+
+    <delete id="deleteCmsResourceByResourceIds" parameterType="String">
+        delete from cms_resource where resource_id in 
+        <foreach item="resourceId" collection="array" open="(" separator="," close=")">
+            #{resourceId}
+        </foreach>
+    </delete>
+</mapper>
