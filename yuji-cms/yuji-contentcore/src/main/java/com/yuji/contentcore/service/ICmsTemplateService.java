@@ -1,10 +1,13 @@
 package com.yuji.contentcore.service;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import com.yuji.contentcore.domain.CmsSite;
 import com.yuji.contentcore.domain.CmsTemplate;
+import com.yuji.contentcore.domain.dto.TemplateRenameDTO;
+import com.yuji.contentcore.domain.dto.TemplateUpdateDTO;
 import com.yuji.contentcore.template.ITemplateType;
 
 /**
@@ -30,6 +33,8 @@ public interface ICmsTemplateService
      * @return 模板管理集合
      */
     public List<CmsTemplate> selectCmsTemplateList(CmsTemplate cmsTemplate);
+
+    public List<CmsTemplate>  selectCmsTemplateByTemplateIdInList(Long[] templateIds);
 
     /**
      * 新增模板管理
@@ -92,5 +97,33 @@ public interface ICmsTemplateService
      * @param typeid 模板类型唯一标识
      */
     ITemplateType getTemplateType(String typeid);
+
+    /**
+     * 保存模板内容
+     */
+    public int saveTemplate(CmsTemplate template, TemplateUpdateDTO dto) throws IOException;
+
+    /**
+     * 模板文件重命名
+     *
+     * @param template 模板信息
+     * @param dto 修改信息
+     * @return 结果
+     */
+    public int renameTemplate(CmsTemplate template, TemplateRenameDTO dto)  throws IOException;
+
+    /**
+     * 清理站点指定模板静态化缓存
+     *
+     * @param templateKey 唯一标识：相对resourceRoot路径
+     */
+    public void clearTemplateStaticContentCache(String templateKey);
+
+    /**
+     * 获取模板文件
+     *
+     * @param template 模板信息
+     */
+    File getTemplateFile(CmsTemplate template);
 
 }

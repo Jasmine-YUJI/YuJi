@@ -47,8 +47,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="indexTemplate != null  and indexTemplate != ''"> and index_template = #{indexTemplate}</if>
             <if test="staticSuffix != null  and staticSuffix != ''"> and static_suffix = #{staticSuffix}</if>
             <if test="sortFlag != null "> and sort_flag = #{sortFlag}</if>
-            <if test="publishPipeProps != null  and publishPipeProps != ''"> and publish_pipe_props = #{publishPipeProps}</if>
-            <if test="configProps != null  and configProps != ''"> and config_props = #{configProps}</if>
             <if test="seoKeywords != null  and seoKeywords != ''"> and seo_keywords = #{seoKeywords}</if>
             <if test="seoDescription != null  and seoDescription != ''"> and seo_description = #{seoDescription}</if>
             <if test="seoTitle != null  and seoTitle != ''"> and seo_title = #{seoTitle}</if>

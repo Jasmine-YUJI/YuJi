@@ -14,6 +14,8 @@
         <el-tooltip content="布局大小" effect="dark" placement="bottom">
           <size-select id="size-select" class="right-menu-item hover-effect" />
         </el-tooltip>
+        <current-site id="current-site" class="right-menu-item" />
+
 
       </template>
 
@@ -46,6 +48,8 @@ import Hamburger from '@/components/Hamburger'
 import Screenfull from '@/components/Screenfull'
 import SizeSelect from '@/components/SizeSelect'
 import Search from '@/components/HeaderSearch'
+import CurrentSite from '@/components/CurrentSite'
+
 
 export default {
   components: {
@@ -54,7 +58,8 @@ export default {
     Hamburger,
     Screenfull,
     SizeSelect,
-    Search
+    Search,
+    CurrentSite,
   },
   computed: {
     ...mapGetters([

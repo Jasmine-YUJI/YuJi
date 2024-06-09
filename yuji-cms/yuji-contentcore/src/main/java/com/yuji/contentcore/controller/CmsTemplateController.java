@@ -2,8 +2,28 @@ package com.yuji.contentcore.controller;
 
 import java.util.List;
 import java.io.IOException;
+import java.util.Objects;
+import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotEmpty;
+
+import com.yuji.common.core.domain.R;
+import com.yuji.common.core.exception.CommonErrorCode;
+import com.yuji.common.core.exception.auth.NotPermissionException;
+import com.yuji.common.core.utils.Assert;
+import com.yuji.common.core.utils.ServletUtils;
+import com.yuji.common.core.utils.StringUtils;
+import com.yuji.common.core.utils.file.FileTypeUtils;
+import com.yuji.common.security.utils.SecurityUtils;
+import com.yuji.contentcore.domain.CmsSite;
+import com.yuji.contentcore.domain.dto.TemplateRenameDTO;
+import com.yuji.contentcore.domain.dto.TemplateUpdateDTO;
+import com.yuji.contentcore.exception.ContentCoreErrorCode;
+import com.yuji.contentcore.perm.SitePermissionType;
+import com.yuji.contentcore.service.ICmsSiteService;
+import com.yuji.contentcore.utils.SiteUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -34,6 +54,9 @@ public class CmsTemplateController extends BaseController
 {
     @Autowired
     private ICmsTemplateService cmsTemplateService;
+
+    @Autowired
+    private ICmsSiteService cmsSiteService;
 
     /**
      * 查询模板管理列表
@@ -87,9 +110,30 @@ public class CmsTemplateController extends BaseController
     @RequiresPermissions("cms:template:edit")
     @Log(title = "模板管理", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult edit(@RequestBody CmsTemplate cmsTemplate)
+    public AjaxResult edit(@RequestBody @Validated TemplateUpdateDTO dto)throws IOException
     {
-        return toAjax(cmsTemplateService.updateCmsTemplate(cmsTemplate));
+        CmsTemplate template = this.cmsTemplateService.selectCmsTemplateByTemplateId(dto.getTemplateId());
+        Assert.notNull(template,
+                () -> CommonErrorCode.DATA_NOT_FOUND_BY_ID.exception("templateId", dto.getTemplateId()));
+
+        CmsSite site = this.cmsSiteService.getCurrentSite(ServletUtils.getRequest());
+        Assert.isTrue(Objects.equals(template.getSiteId(), site.getSiteId()),() -> new NotPermissionException(SitePermissionType.SitePrivItem.View.getPermissionKey(site.getSiteId())));
+        dto.setOperator(SecurityUtils.getUsername());
+        return toAjax(this.cmsTemplateService.saveTemplate(template, dto));
+    }
+
+    @Log(title = "重命名模板", businessType = BusinessType.UPDATE)
+    @PostMapping("/rename")
+    public AjaxResult rename(@RequestBody @Validated TemplateRenameDTO dto) throws IOException {
+        Assert.isTrue(validTemplateName(dto.getPath()), ContentCoreErrorCode.INVALID_TEMPLATE_NAME::exception);
+        CmsTemplate template = this.cmsTemplateService.selectCmsTemplateByTemplateId(dto.getTemplateId());
+        Assert.notNull(template,
+                () -> CommonErrorCode.DATA_NOT_FOUND_BY_ID.exception("templateId", dto.getTemplateId()));
+
+        CmsSite site = this.cmsSiteService.getCurrentSite(ServletUtils.getRequest());
+        Assert.isTrue(Objects.equals(template.getSiteId(), site.getSiteId()),() -> new NotPermissionException(SitePermissionType.SitePrivItem.View.getPermissionKey(site.getSiteId())));
+        dto.setOperator(SecurityUtils.getUsername());
+        return toAjax(this.cmsTemplateService.renameTemplate(template, dto));
     }
 
     /**
@@ -101,5 +145,33 @@ public class CmsTemplateController extends BaseController
     public AjaxResult remove(@PathVariable Long[] templateIds)
     {
         return toAjax(cmsTemplateService.deleteCmsTemplateByTemplateIds(templateIds));
+    }
+
+    private static boolean validTemplateName(String fileName) {
+        String suffix = ".template.html";
+        if (StringUtils.isEmpty(fileName) || !fileName.endsWith(suffix)) {
+            return false;
+        }
+        fileName = FileTypeUtils.normalizePath(fileName);
+        String[] split = fileName.substring(0, fileName.indexOf(suffix)).split("/");
+        for (String item : split) {
+            System.out.println(item);
+            System.out.println(Pattern.matches("[a-zA-Z0-9_]+", item));
+            if (StringUtils.isEmpty(item) || !Pattern.matches("^[a-zA-Z0-9_]+$", item)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Log(title = "清理区块缓存", businessType = BusinessType.OTHER)
+    @DeleteMapping("/clearIncludeCache")
+    public R<?> clearIncludeCache(@RequestBody @NotEmpty Long[] templateIds) {
+        cmsTemplateService.selectCmsTemplateByTemplateIdInList(templateIds).forEach(template -> {
+            CmsSite site = cmsSiteService.selectCmsSiteBySiteId(template.getSiteId());
+            String templateKey = SiteUtils.getTemplateKey(site, template.getPublishPipeCode(), template.getPath());
+            cmsTemplateService.clearTemplateStaticContentCache(templateKey);
+        });
+        return R.ok();
     }
 }

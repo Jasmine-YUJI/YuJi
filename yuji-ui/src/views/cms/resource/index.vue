@@ -169,7 +169,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -224,7 +224,7 @@
 </template>
 
 <script>
-import { listResource, getResource, delResource, addResource, updateResource } from "@/api/cms/resource";
+import { listResource, getResource, delResource, addResource, updateResource } from "@/api/cms/contentcore/resource";
 
 export default {
   name: "Resource",

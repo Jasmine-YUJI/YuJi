@@ -2,7 +2,11 @@ package com.yuji.contentcore.controller;
 
 import java.util.List;
 import java.io.IOException;
+import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
+
+import com.yuji.common.core.domain.R;
+import com.yuji.common.core.utils.ServletUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -101,5 +105,28 @@ public class CmsSiteController extends BaseController
     public AjaxResult remove(@PathVariable Long[] siteIds)
     {
         return toAjax(cmsSiteService.deleteCmsSiteBySiteIds(siteIds));
+    }
+
+    /**
+     * 获取当前站点数据
+     *
+     * @apiNote 读取request.header['CurrentSite']中的siteId，如果无header或无站点则取数据库第一条站点数据
+     */
+    @GetMapping("/getCurrentSite")
+    public R<Map<String, Object>> getCurrentSite() {
+        CmsSite site = this.cmsSiteService.getCurrentSite(ServletUtils.getRequest());
+        return R.ok(Map.of("siteId", site.getSiteId(), "siteName", site.getName()));
+    }
+
+    /**
+     * 设置当前站点
+     *
+     * @param siteId 站点ID
+     */
+    @Log(title = "切换站点", businessType = BusinessType.UPDATE)
+    @PostMapping("/setCurrentSite/{siteId}")
+    public R<Map<String, Object>> setCurrentSite(@PathVariable("siteId")  Long siteId) {
+        CmsSite site = this.cmsSiteService.selectCmsSiteBySiteId(siteId);
+        return R.ok(Map.of("siteId", site.getSiteId(), "siteName", site.getName()));
     }
 }

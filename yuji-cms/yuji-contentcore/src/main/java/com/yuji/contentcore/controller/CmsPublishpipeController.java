@@ -2,7 +2,13 @@ package com.yuji.contentcore.controller;
 
 import java.util.List;
 import java.io.IOException;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
+
+import com.yuji.common.core.utils.ServletUtils;
+import com.yuji.contentcore.domain.CmsSite;
+import com.yuji.contentcore.domain.dto.PublishPipeProp;
+import com.yuji.contentcore.service.ICmsSiteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,6 +41,8 @@ public class CmsPublishpipeController extends BaseController
     @Autowired
     private ICmsPublishpipeService cmsPublishpipeService;
 
+    @Autowired
+    private ICmsSiteService siteService;
     /**
      * 查询发布通道列表
      */
@@ -101,5 +109,19 @@ public class CmsPublishpipeController extends BaseController
     public AjaxResult remove(@PathVariable Long[] publishpipeIds)
     {
         return toAjax(cmsPublishpipeService.deleteCmsPublishpipeByPublishpipeIds(publishpipeIds));
+    }
+
+    /**
+     * 获取当前站点发布通道选择器数据
+     *
+     * @return
+     */
+    @GetMapping("/selectData")
+    public AjaxResult bindSelectData() {
+        CmsSite site = this.siteService.getCurrentSite(ServletUtils.getRequest());
+        List<PublishPipeProp> datalist = this.cmsPublishpipeService.getPublishPipes(site.getSiteId())
+                .stream().map(p -> PublishPipeProp.newInstance(p.getCode(), p.getName(), null))
+                .collect(Collectors.toList());
+        return AjaxResult.success(datalist);
     }
 }

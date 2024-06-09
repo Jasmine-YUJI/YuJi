@@ -1,340 +1,365 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="站点ID" prop="siteId">
-        <el-input
-          v-model="queryParams.siteId"
-          placeholder="请输入站点ID"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="发布通道编码" prop="publishPipeCode">
-        <el-input
-          v-model="queryParams.publishPipeCode"
-          placeholder="请输入发布通道编码"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="模板路径" prop="path">
-        <el-input
-          v-model="queryParams.path"
-          placeholder="请输入模板路径"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="模板文件大小" prop="filesize">
-        <el-input
-          v-model="queryParams.filesize"
-          placeholder="请输入模板文件大小"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="模板文件更新时间戳" prop="modifyTime">
-        <el-input
-          v-model="queryParams.modifyTime"
-          placeholder="请输入模板文件更新时间戳"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
-      </el-form-item>
-    </el-form>
-
-    <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
-        <el-button
-          type="primary"
-          plain
-          icon="el-icon-plus"
-          size="mini"
-          @click="handleAdd"
-          v-hasPermi="['cms:template:add']"
-        >新增</el-button>
+    <el-row :gutter="24" class="mb12">
+      <el-col :span="12">
+        <el-row :gutter="10">
+          <el-col :span="1.5">
+            <el-button
+              type="primary"
+              icon="el-icon-plus"
+              size="mini"
+              plain
+              @click="handleAdd">{{ $t("Common.Add") }}</el-button>
+          </el-col>
+          <el-col :span="1.5">
+            <el-button
+              type="success"
+              icon="el-icon-edit"
+              size="mini"
+              plain
+              :disabled="single"
+              @click="handleEdit">{{ $t('Common.Edit') }}</el-button>
+          </el-col>
+          <el-col :span="1.5">
+            <el-button
+              type="danger"
+              icon="el-icon-delete"
+              size="mini"
+              plain
+              :disabled="multiple"
+              @click="handleDelete">{{ $t("Common.Delete") }}</el-button>
+          </el-col>
+          <el-col :span="1.5">
+            <el-button
+              type="danger"
+              icon="el-icon-remove-outline"
+              size="mini"
+              plain
+              :disabled="multiple"
+              @click="handleClearIncludeCache">{{ $t("CMS.Template.ClearIncludeCache") }}</el-button>
+          </el-col>
+        </el-row>
       </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="success"
-          plain
-          icon="el-icon-edit"
+      <el-col :span="12" style="text-align:right">
+        <el-form
+          :model="queryParams"
+          ref="queryForm"
+          :inline="true"
           size="mini"
-          :disabled="single"
-          @click="handleUpdate"
-          v-hasPermi="['cms:template:edit']"
-        >修改</el-button>
+          class="el-form-search">
+          <el-form-item prop="publishPipeCode">
+            <el-select v-model="queryParams.publishPipeCode" :placeholder="$t('CMS.ContentCore.PublishPipe')" style="width:120px;">
+              <el-option
+                v-for="pp in publishPipes"
+                :key="pp.pipeCode"
+                :label="pp.pipeName"
+                :value="pp.pipeCode"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item prop="filename">
+            <el-input v-model="queryParams.filename" :placeholder="$t('CMS.Template.Name')"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button-group>
+              <el-button
+                type="primary"
+                icon="el-icon-search"
+                @click="handleQuery">{{ $t("Common.Search") }}</el-button>
+              <el-button
+                icon="el-icon-refresh"
+                @click="resetQuery">{{ $t("Common.Reset") }}</el-button>
+            </el-button-group>
+          </el-form-item>
+        </el-form>
       </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="danger"
-          plain
-          icon="el-icon-delete"
-          size="mini"
-          :disabled="multiple"
-          @click="handleDelete"
-          v-hasPermi="['cms:template:remove']"
-        >删除</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="warning"
-          plain
-          icon="el-icon-download"
-          size="mini"
-          @click="handleExport"
-          v-hasPermi="['cms:template:export']"
-        >导出</el-button>
-      </el-col>
-      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="templateList" @selection-change="handleSelectionChange">
-      <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="主键ID" align="center" prop="templateId" />
-      <el-table-column label="站点ID" align="center" prop="siteId" />
-      <el-table-column label="发布通道编码" align="center" prop="publishPipeCode" />
-      <el-table-column label="模板路径" align="center" prop="path" />
-      <el-table-column label="模板内容" align="center" prop="content" />
-      <el-table-column label="模板文件大小" align="center" prop="filesize" />
-      <el-table-column label="模板文件更新时间戳" align="center" prop="modifyTime" />
-      <el-table-column label="备注" align="center" prop="remark" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
-        <template slot-scope="scope">
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-edit"
-            @click="handleUpdate(scope.row)"
-            v-hasPermi="['cms:template:edit']"
-          >修改</el-button>
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['cms:template:remove']"
-          >删除</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-    
-    <pagination
-      v-show="total>0"
-      :total="total"
-      :page.sync="queryParams.pageNum"
-      :limit.sync="queryParams.pageSize"
-      @pagination="getList"
-    />
-
-    <!-- 添加或修改模板管理对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="站点ID" prop="siteId">
-          <el-input v-model="form.siteId" placeholder="请输入站点ID" />
+    <el-row>
+      <el-col>
+        <el-table
+          v-loading="loading"
+          :data="templateList"
+          @selection-change="handleSelectionChange"
+          @row-dblclick="handleEdit">
+          <el-table-column type="selection" width="50" align="center" />
+          <el-table-column type="index" :label="$t('Common.RowNo')" align="center" width="80" />
+          <el-table-column
+            :label="$t('CMS.ContentCore.PublishPipe')"
+            align="center"
+            width="160"
+            prop="publishPipeCode" />
+          <el-table-column
+            :label="$t('CMS.Template.Name')"
+            align="left"
+            :show-overflow-tooltip="true"
+            prop="path">
+          </el-table-column>
+          <el-table-column
+            :label="$t('Common.Remark')"
+            align="left"
+            :show-overflow-tooltip="true"
+            width="120"
+            prop="remark">
+          </el-table-column>
+          <el-table-column
+            :label="$t('CMS.Template.FileSize')"
+            align="right"
+            width="160"
+            prop="filesizeName" />
+          <el-table-column
+            :label="$t('CMS.Template.ModifyTime')"
+            align="center"
+            width="160"
+            prop="modifyTime" />
+          <el-table-column
+            :label="$t('Common.Operation')"
+            align="center"
+            width="320"
+            class-name="small-padding fixed-width">
+            <template slot-scope="scope">
+              <el-button
+                type="text"
+                icon="el-icon-edit"
+                size="small"
+                @click="handleRename(scope.row)">{{ $t('CMS.Template.Rename') }}</el-button>
+              <el-button
+                type="text"
+                icon="el-icon-edit"
+                size="small"
+                @click="handleEdit(scope.row)">{{ $t("Common.Edit") }}</el-button>
+              <el-button
+                type="text"
+                icon="el-icon-delete"
+                size="small"
+                @click="handleDelete(scope.row)">{{ $t("Common.Delete") }}</el-button>
+              <el-button
+                type="text"
+                size="small"
+                icon="el-icon-remove-outline"
+                @click="handleClearIncludeCache(scope.row)">{{ $t("CMS.Template.ClearIncludeCache") }}</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <pagination
+          v-show="total>0"
+          :total="total"
+          :page.sync="queryParams.pageNum"
+          :limit.sync="queryParams.pageSize"
+          @pagination="getList"
+        />
+      </el-col>
+    </el-row>
+    <!-- 添加或修改模板文件对话框 -->
+    <el-dialog
+      :title="title"
+      :visible.sync="open"
+      width="500px"
+      append-to-body>
+      <el-form
+        ref="form"
+        :model="form"
+        :rules="rules"
+        label-width="100px">
+        <el-form-item v-if="!form.templateId||form.templateId==0" :label="$t('CMS.ContentCore.PublishPipe')" prop="publishPipeCode">
+          <el-select v-model="form.publishPipeCode" >
+            <el-option
+              v-for="pp in publishPipes"
+              :key="pp.pipeCode"
+              :label="pp.pipeName"
+              :value="pp.pipeCode"
+            />
+          </el-select>
         </el-form-item>
-        <el-form-item label="发布通道编码" prop="publishPipeCode">
-          <el-input v-model="form.publishPipeCode" placeholder="请输入发布通道编码" />
+        <el-form-item :label="$t('CMS.Template.Name')" prop="path">
+          <el-input v-model="form.path" />
         </el-form-item>
-        <el-form-item label="模板路径" prop="path">
-          <el-input v-model="form.path" placeholder="请输入模板路径" />
-        </el-form-item>
-        <el-form-item label="模板内容">
-          <editor v-model="form.content" :min-height="192"/>
-        </el-form-item>
-        <el-form-item label="模板文件大小" prop="filesize">
-          <el-input v-model="form.filesize" placeholder="请输入模板文件大小" />
-        </el-form-item>
-        <el-form-item label="模板文件更新时间戳" prop="modifyTime">
-          <el-input v-model="form.modifyTime" placeholder="请输入模板文件更新时间戳" />
-        </el-form-item>
-        <el-form-item label="备注" prop="remark">
-          <el-input v-model="form.remark" placeholder="请输入备注" />
+        <el-form-item :label="$t('Common.Remark')" prop="remark">
+          <el-input v-model="form.remark" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
-        <el-button @click="cancel">取 消</el-button>
+        <el-button type="primary" @click="submitForm">{{ $t("Common.Confirm") }}</el-button>
+        <el-button @click="cancel">{{ $t("Common.Cancel") }}</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
-
 <script>
-import { listTemplate, getTemplate, delTemplate, addTemplate, updateTemplate } from "@/api/cms/template";
+import { getPublishPipeSelectData } from "@/api/cms/contentcore/publishpipe";
+import { getConfigKey } from "@/api/system/config"
+import { getTemplateList, getTemplateDetail, renameTemplate, addTemplate, delTemplate, clearIncludeCache } from "@/api/cms/contentcore/template";
 
 export default {
-  name: "Template",
-  data() {
+  name: "CmsTemplate",
+  data () {
+    const validatePath = (rule, value, callback) => {
+        if (!value || value.length == 0 || !value.endsWith(this.templateSuffix)) {
+          callback(new Error(this.$t('CMS.Template.RuleTips.Name', [ this.templateSuffix ])));
+          return;
+        }
+        const sr = value.substring(0, value.indexOf(this.templateSuffix));
+        const hasMatchFail = value.substring(0, value.indexOf(this.templateSuffix)).split('\/').some(item => !(/^[A-Za-z0-9_\\.\/]+$/.test(item)));
+        if (hasMatchFail) {
+            callback(new Error(this.$t('CMS.Template.RuleTips.Name', [ this.templateSuffix ])));
+            return;
+        }
+        callback();
+      };
     return {
       // 遮罩层
       loading: true,
       // 选中数组
-      ids: [],
+      selectedIds: [],
       // 非单个禁用
       single: true,
       // 非多个禁用
       multiple: true,
-      // 显示搜索条件
-      showSearch: true,
-      // 总条数
-      total: 0,
-      // 模板管理表格数据
+      // 资源表格数据
       templateList: [],
+      total: 0,
       // 弹出层标题
       title: "",
       // 是否显示弹出层
       open: false,
+      publishPipes: [],
       // 查询参数
       queryParams: {
-        pageNum: 1,
-        pageSize: 10,
-        siteId: null,
-        publishPipeCode: null,
-        path: null,
-        content: null,
-        filesize: null,
-        modifyTime: null,
+        publishPipeCode: undefined,
+        filename: undefined
       },
+      templateSuffix: ".contentcore.html",
+      isRename: false,
       // 表单参数
       form: {},
       // 表单校验
       rules: {
-        siteId: [
-          { required: true, message: "站点ID不能为空", trigger: "blur" }
-        ],
-        publishPipeCode: [
-          { required: true, message: "发布通道编码不能为空", trigger: "blur" }
-        ],
         path: [
-          { required: true, message: "模板路径不能为空", trigger: "blur" }
-        ],
-        content: [
-          { required: true, message: "模板内容不能为空", trigger: "blur" }
-        ],
-        filesize: [
-          { required: true, message: "模板文件大小不能为空", trigger: "blur" }
-        ],
-        modifyTime: [
-          { required: true, message: "模板文件更新时间戳不能为空", trigger: "blur" }
-        ],
-        createBy: [
-          { required: true, message: "创建人不能为空", trigger: "blur" }
-        ],
-        createTime: [
-          { required: true, message: "创建时间不能为空", trigger: "blur" }
-        ],
+          { trigger: "blur", validator: validatePath }
+        ]
       }
     };
   },
-  created() {
+  created () {
+    getPublishPipeSelectData().then(response => {
+        this.publishPipes = response.data;
+      });
+    getConfigKey("cms.template.suffix").then(response => {
+      this.templateSuffix = response.msg;
+    })
     this.getList();
   },
   methods: {
-    /** 查询模板管理列表 */
-    getList() {
+    /** 查询资源列表 */
+    getList () {
       this.loading = true;
-      listTemplate(this.queryParams).then(response => {
+      getTemplateList(this.queryParams).then(response => {
         this.templateList = response.rows;
-        this.total = response.total;
+        this.total = parseInt(response.total);
         this.loading = false;
       });
     },
     // 取消按钮
-    cancel() {
+    cancel () {
       this.open = false;
       this.reset();
     },
     // 表单重置
-    reset() {
-      this.form = {
-        templateId: null,
-        siteId: null,
-        publishPipeCode: null,
-        path: null,
-        content: null,
-        filesize: null,
-        modifyTime: null,
-        createBy: null,
-        createTime: null,
-        updateBy: null,
-        updateTime: null,
-        remark: null
-      };
+    reset () {
       this.resetForm("form");
     },
     /** 搜索按钮操作 */
-    handleQuery() {
-      this.queryParams.pageNum = 1;
+    handleQuery () {
       this.getList();
     },
     /** 重置按钮操作 */
-    resetQuery() {
+    resetQuery () {
       this.resetForm("queryForm");
       this.handleQuery();
     },
     // 多选框选中数据
-    handleSelectionChange(selection) {
-      this.ids = selection.map(item => item.templateId)
-      this.single = selection.length!==1
-      this.multiple = !selection.length
+    handleSelectionChange (selection) {
+      this.selectedIds = selection.map(item => item.templateId);
+      this.single = selection.length != 1;
+      this.multiple = !selection.length;
     },
     /** 新增按钮操作 */
-    handleAdd() {
-      this.reset();
+    handleAdd () {
+      this.form = {};
       this.open = true;
-      this.title = "添加模板管理";
+      this.title = this.$t('CMS.Template.AddT' +
+        'itle');
     },
     /** 修改按钮操作 */
-    handleUpdate(row) {
-      this.reset();
-      const templateId = row.templateId || this.ids
-      getTemplate(templateId).then(response => {
+    handleRename (row) {
+      this.form = {};
+      getTemplateDetail(row.templateId).then(response => {
         this.form = response.data;
         this.open = true;
-        this.title = "修改模板管理";
+        this.title = this.$t('CMS.Template.EditTitle');
+      });
+    },
+    handleEdit (row) {
+      this.$router.push({
+        path: "/cms/template/editor",
+        query: {
+          id: row.templateId
+        }
       });
     },
     /** 提交按钮 */
-    submitForm() {
+    submitForm: function () {
       this.$refs["form"].validate(valid => {
         if (valid) {
-          if (this.form.templateId != null) {
-            updateTemplate(this.form).then(response => {
-              this.$modal.msgSuccess("修改成功");
+          if (this.form.templateId) {
+            renameTemplate(this.form).then(response => {
+              this.$modal.msgSuccess(this.$t('Common.SaveSuccess'));
               this.open = false;
               this.getList();
             });
           } else {
             addTemplate(this.form).then(response => {
-              this.$modal.msgSuccess("新增成功");
+              this.$modal.msgSuccess(this.$t('Common.SaveSuccess'));
               this.open = false;
               this.getList();
             });
           }
+
         }
       });
     },
     /** 删除按钮操作 */
-    handleDelete(row) {
-      const templateIds = row.templateId || this.ids;
-      this.$modal.confirm('是否确认删除模板管理编号为"' + templateIds + '"的数据项？').then(function() {
+    handleDelete (row) {
+      const templateIds = row.templateId ? [ row.templateId ] : this.selectedIds
+      this.$modal.confirm(this.$t('Common.ConfirmDelete')).then(function () {
         return delTemplate(templateIds);
       }).then(() => {
+        this.$modal.msgSuccess(this.$t('Common.SaveSuccess'));
         this.getList();
-        this.$modal.msgSuccess("删除成功");
-      }).catch(() => {});
+      }).catch(function () { });
     },
-    /** 导出按钮操作 */
-    handleExport() {
-      this.download('cms/template/export', {
-        ...this.queryParams
-      }, `template_${new Date().getTime()}.xlsx`)
+    handleClearIncludeCache(row) {
+      const templateIds = row.templateId ? [ row.templateId ] : this.selectedIds
+      clearIncludeCache(templateIds).then(response => {
+        this.$modal.msgSuccess(this.$t('Common.SaveSuccess'));
+      });
     }
   }
 };
 </script>
+<style scoped>
+.time {
+  font-size: 13px;
+  color: #999;
+}
+.el-card {
+  margin-bottom: 10px;
+  padding: 10px;
+}
+.r-image {
+  width: 130px;
+}
+.el-form-search {
+  width: 100%;
+}
+</style>

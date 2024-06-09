@@ -159,7 +159,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -214,7 +214,7 @@
 </template>
 
 <script>
-import { listPageWidget, getPageWidget, delPageWidget, addPageWidget, updatePageWidget } from "@/api/cms/pageWidget";
+import { listPageWidget, getPageWidget, delPageWidget, addPageWidget, updatePageWidget } from "@/api/cms/contentcore/pageWidget";
 
 export default {
   name: "PageWidget",

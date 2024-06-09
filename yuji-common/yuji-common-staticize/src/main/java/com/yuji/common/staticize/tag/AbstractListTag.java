@@ -21,9 +21,9 @@ public abstract class AbstractListTag extends AbstractTag {
 	@Override
 	public List<TagAttr> getTagAttrs() {
 		List<TagAttr> tagAttrs = new ArrayList<>();
-		tagAttrs.add(new TagAttr(TagAttr.AttrName_Page, false, TagAttrDataType.BOOLEAN, "是否分页获取数据", "false"));
-		tagAttrs.add(new TagAttr(TagAttr.AttrName_PageSize, false, TagAttrDataType.INTEGER, "分页数据条数，默认：20"));
-		tagAttrs.add(new TagAttr(TagAttr.AttrName_Condition, false, TagAttrDataType.STRING, "扩展sql条件语句，例如：title like 'a%'"));
+		tagAttrs.add(new TagAttr(TagAttr.AttrName_Page, false, TagAttrDataType.BOOLEAN, "{FREEMARKER.TAG_ATTR.PAGE}", "false"));
+		tagAttrs.add(new TagAttr(TagAttr.AttrName_PageSize, false, TagAttrDataType.INTEGER, "{FREEMARKER.TAG_ATTR.PAGE_SIZE}"));
+		tagAttrs.add(new TagAttr(TagAttr.AttrName_Condition, false, TagAttrDataType.STRING, "{FREEMARKER.TAG_ATTR.CONDITION}"));
 		return tagAttrs;
 	}
 

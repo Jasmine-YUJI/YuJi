@@ -121,7 +121,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -161,7 +161,7 @@
 </template>
 
 <script>
-import { listPublishpipe, getPublishpipe, delPublishpipe, addPublishpipe, updatePublishpipe } from "@/api/cms/publishpipe";
+import { listPublishpipe, getPublishpipe, delPublishpipe, addPublishpipe, updatePublishpipe } from "@/api/cms/contentcore/publishpipe";
 
 export default {
   name: "Publishpipe",

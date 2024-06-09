@@ -196,7 +196,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -269,7 +269,7 @@
 </template>
 
 <script>
-import { listSite, getSite, delSite, addSite, updateSite } from "@/api/cms/site";
+import { listSite, getSite, delSite, addSite, updateSite } from "@/api/cms/contentcore/site";
 
 export default {
   name: "Site",

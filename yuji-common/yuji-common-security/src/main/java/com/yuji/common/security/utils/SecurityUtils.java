@@ -9,6 +9,8 @@ import com.yuji.common.core.utils.ServletUtils;
 import com.yuji.common.core.utils.StringUtils;
 import com.yuji.system.api.model.LoginUser;
 
+import java.util.Objects;
+
 /**
  * 权限获取工具类
  * 
@@ -38,6 +40,13 @@ public class SecurityUtils
     public static String getUserKey()
     {
         return SecurityContextHolder.getUserKey();
+    }
+
+    /**
+     * 获取用户Permission
+     */
+    public static String getPermission() {
+        return SecurityContextHolder.getPermission();
     }
 
     /**
@@ -88,6 +97,10 @@ public class SecurityUtils
     public static boolean isAdmin(Long userId)
     {
         return userId != null && 1L == userId;
+    }
+
+    public static boolean hasPermission(String perm,Long userId) {
+        return isAdmin(userId) || (Objects.nonNull(getPermission()) && getPermission().contains(perm));
     }
 
     /**

@@ -1,17 +1,25 @@
 package com.yuji.contentcore.service.impl;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import com.yuji.common.core.utils.DateUtils;
 import com.yuji.common.core.utils.StringUtils;
+import com.yuji.common.core.utils.file.FileTypeUtils;
 import com.yuji.common.redis.service.RedisService;
 import com.yuji.contentcore.ContentCoreConsts;
 import com.yuji.contentcore.domain.CmsSite;
+import com.yuji.contentcore.domain.dto.TemplateRenameDTO;
+import com.yuji.contentcore.domain.dto.TemplateUpdateDTO;
+import com.yuji.contentcore.exception.ContentCoreErrorCode;
+import com.yuji.contentcore.mapper.CmsSiteMapper;
 import com.yuji.contentcore.template.ITemplateType;
 import com.yuji.contentcore.utils.SiteUtils;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.yuji.contentcore.mapper.CmsTemplateMapper;
@@ -31,8 +39,13 @@ public class CmsTemplateServiceImpl implements ICmsTemplateService
 
     @Autowired
     private CmsTemplateMapper cmsTemplateMapper;
+
+    @Autowired
+    private CmsSiteMapper cmsSiteMapper;
+
     @Autowired
     private RedisService redisService;
+
     @Autowired
     private Map<String, ITemplateType> templateTypes;
 
@@ -58,6 +71,11 @@ public class CmsTemplateServiceImpl implements ICmsTemplateService
     public List<CmsTemplate> selectCmsTemplateList(CmsTemplate cmsTemplate)
     {
         return cmsTemplateMapper.selectCmsTemplateList(cmsTemplate);
+    }
+
+    @Override
+    public List<CmsTemplate>  selectCmsTemplateByTemplateIdInList(Long[] templateIds){
+        return cmsTemplateMapper.selectCmsTemplateByTemplateIdInList(templateIds);
     }
 
     /**
@@ -143,5 +161,61 @@ public class CmsTemplateServiceImpl implements ICmsTemplateService
     @Override
     public ITemplateType getTemplateType(String typeId) {
         return this.templateTypes.get(ITemplateType.BEAN_NAME_PREFIX + typeId);
+    }
+
+    @Override
+    public int saveTemplate(CmsTemplate template, TemplateUpdateDTO dto) throws IOException {
+        template.setContent(dto.getContent());
+        template.setRemark(dto.getRemark());
+        // 变更文件内容
+        File file = this.getTemplateFile(template);
+        FileTypeUtils.mkdirs(file.getParentFile().getAbsolutePath());
+
+        FileUtils.writeStringToFile(file, dto.getContent(), StandardCharsets.UTF_8);
+
+        template.setModifyTime(file.lastModified());
+        template.setUpdateBy(dto.getOperator());
+        int res = cmsTemplateMapper.updateCmsTemplate(template);
+        // 清理include缓存
+        this.clearTemplateStaticContentCache(template);
+        return res;
+    }
+
+    @Override
+    public int renameTemplate(CmsTemplate template, TemplateRenameDTO dto)  throws IOException {
+        String newPath = FileTypeUtils.normalizePath(dto.getPath());
+        if (!template.getPath().equals(newPath)) {
+            CmsSite site = this.cmsSiteMapper.selectCmsSiteBySiteId(template.getSiteId());
+            String siteRoot = SiteUtils.getSiteRoot(site, template.getPublishPipeCode());
+            File file = new File(siteRoot + ContentCoreConsts.TemplateDirectory + template.getPath());
+            File dest = new File(siteRoot + ContentCoreConsts.TemplateDirectory + newPath);
+            FileUtils.moveFile(file, dest);
+            template.setPath(newPath);
+        }
+        template.setRemark(dto.getRemark());
+        template.setUpdateBy(dto.getOperator());
+        return cmsTemplateMapper.updateCmsTemplate(template);
+    }
+
+    @Override
+    public void clearTemplateStaticContentCache(String templateKey) {
+        this.redisService.deleteObject(TEMPLATE_STATIC_CONTENT_CACHE_KEY_PREFIX + templateKey);
+    }
+
+    @Override
+    public File getTemplateFile(CmsTemplate template) {
+        CmsSite site = this.cmsSiteMapper.selectCmsSiteBySiteId(template.getSiteId());
+        String siteRoot = SiteUtils.getSiteRoot(site, template.getPublishPipeCode());
+        File templateFile = new File(siteRoot + ContentCoreConsts.TemplateDirectory + template.getPath());
+        if (templateFile.exists() && !templateFile.isFile()) {
+            throw ContentCoreErrorCode.TEMPLATE_PATH_EXISTS.exception();
+        }
+        return templateFile;
+    }
+
+    private void clearTemplateStaticContentCache(CmsTemplate template) {
+        CmsSite site = this.cmsSiteMapper.selectCmsSiteBySiteId(template.getSiteId());
+        String templateKey = SiteUtils.getTemplateKey(site, template.getPublishPipeCode(), template.getPath());
+        this.clearTemplateStaticContentCache(templateKey);
     }
 }

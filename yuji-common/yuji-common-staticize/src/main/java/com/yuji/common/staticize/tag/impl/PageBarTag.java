@@ -23,8 +23,8 @@ import java.util.Map;
 public class PageBarTag extends AbstractTag {
 
 	public final static String TAG_NAME = "page_bar";
-	public final static String NAME = "分页条标签";
-	public final static String DESC = "生成固定格式的分页条html代码，样式由模板样式决定";
+	public final static String NAME = "{FREEMARKER.TAG.NAME." + TAG_NAME + "}";
+	public final static String DESC = "{FREEMARKER.TAG.DESC." + TAG_NAME + "}";
 
 	@Override
 	public String getTagName() {

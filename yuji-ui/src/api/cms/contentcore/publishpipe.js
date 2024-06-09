@@ -42,3 +42,12 @@ export function delPublishpipe(publishpipeId) {
     method: 'delete'
   })
 }
+
+// 查询发布通道列表
+export function getPublishPipeSelectData(query) {
+  return request({
+    url: '/cms/publishpipe/selectData',
+    method: 'get',
+    params: query
+  })
+}

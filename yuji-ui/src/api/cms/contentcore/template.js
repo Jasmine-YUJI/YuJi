@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 
 // 查询模板管理列表
-export function listTemplate(query) {
+export function getTemplateList(query) {
   return request({
     url: '/cms/template/list',
     method: 'get',
@@ -10,7 +10,7 @@ export function listTemplate(query) {
 }
 
 // 查询模板管理详细
-export function getTemplate(templateId) {
+export function getTemplateDetail(templateId) {
   return request({
     url: '/cms/template/' + templateId,
     method: 'get'
@@ -27,7 +27,7 @@ export function addTemplate(data) {
 }
 
 // 修改模板管理
-export function updateTemplate(data) {
+export function editTemplate(data) {
   return request({
     url: '/cms/template',
     method: 'put',
@@ -40,5 +40,23 @@ export function delTemplate(templateId) {
   return request({
     url: '/cms/template/' + templateId,
     method: 'delete'
+  })
+}
+
+// 模板文件重命名
+export function renameTemplate(data) {
+  return request({
+    url: '/cms/template/rename',
+    method: 'post',
+    data: data
+  })
+}
+
+// 删除区块模板缓存
+export function clearIncludeCache(templates) {
+  return request({
+    url: '/cms/template/clearIncludeCache',
+    method: 'delete',
+    data: templates
   })
 }

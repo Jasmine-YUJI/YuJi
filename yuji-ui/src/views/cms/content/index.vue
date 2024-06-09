@@ -454,7 +454,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -623,7 +623,7 @@
 </template>
 
 <script>
-import { listContent, getContent, delContent, addContent, updateContent } from "@/api/cms/content";
+import { listContent, getContent, delContent, addContent, updateContent } from "@/api/cms/contentcore/content";
 
 export default {
   name: "Content",

@@ -27,6 +27,9 @@ public interface CmsTemplateMapper
      */
     public List<CmsTemplate> selectCmsTemplateList(CmsTemplate cmsTemplate);
 
+    public List<CmsTemplate>  selectCmsTemplateByTemplateIdInList(Long[] templateIds);
+
+
     /**
      * 新增模板管理
      * 

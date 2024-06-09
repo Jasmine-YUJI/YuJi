@@ -1,12 +1,26 @@
 package com.yuji.contentcore.service.impl;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
+import com.yuji.common.core.utils.Assert;
+import com.yuji.common.core.utils.ConvertUtils;
 import com.yuji.common.core.utils.DateUtils;
+import com.yuji.common.core.utils.ServletUtils;
+import com.yuji.common.core.utils.uuid.IdUtils;
+import com.yuji.common.security.utils.SecurityUtils;
+import com.yuji.contentcore.ContentCoreConsts;
+import com.yuji.contentcore.exception.ContentCoreErrorCode;
+import com.yuji.contentcore.perm.SitePermissionType.SitePrivItem;
+import com.yuji.system.api.model.LoginUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.yuji.contentcore.mapper.CmsSiteMapper;
 import com.yuji.contentcore.domain.CmsSite;
 import com.yuji.contentcore.service.ICmsSiteService;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 站点管理Service业务层处理
@@ -30,6 +44,32 @@ public class CmsSiteServiceImpl implements ICmsSiteService
     public CmsSite selectCmsSiteBySiteId(Long siteId)
     {
         return cmsSiteMapper.selectCmsSiteBySiteId(siteId);
+    }
+
+    /**
+     * 获取当前站点，保存在token中
+     */
+    @Override
+    public CmsSite getCurrentSite(HttpServletRequest request) {
+        LoginUser loginUser = SecurityUtils.getLoginUser();
+        CmsSite site = null;
+        Long siteId = ConvertUtils.toLong(ServletUtils.getHeader(request, ContentCoreConsts.Header_CurrentSite));
+        if (IdUtils.validate(siteId)
+                && SecurityUtils.hasPermission(SitePrivItem.View.getPermissionKey(siteId),loginUser.getUserid())) {
+            site = this.selectCmsSiteBySiteId(siteId);
+        }
+        // 无当前站点或当前站点无权限则取数据库查找一条有权限的站点数据作为当前站点
+        if (Objects.isNull(site)) {
+
+            List<CmsSite> list = cmsSiteMapper.selectCmsSiteList(new CmsSite());
+            Optional<CmsSite> opt = list.stream().filter(s ->
+                    SecurityUtils.hasPermission(SitePrivItem.View.getPermissionKey(s.getSiteId()),loginUser.getUserid())).findFirst();
+            if (opt.isPresent()) {
+                site = opt.get();
+            }
+        }
+        Assert.notNull(site, ContentCoreErrorCode.NO_SITE::exception);
+        return site;
     }
 
     /**

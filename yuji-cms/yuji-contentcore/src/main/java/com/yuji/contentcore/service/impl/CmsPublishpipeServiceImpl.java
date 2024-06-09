@@ -75,6 +75,17 @@ public class CmsPublishpipeServiceImpl implements ICmsPublishpipeService
     }
 
     /**
+     * 获取指定站点可用发布通道
+     *
+     * @param siteId 站点ID
+     * @return 结果列表
+     */
+    @Override
+    public List<CmsPublishpipe> getPublishPipes(Long siteId) {
+        return cmsPublishpipeMapper.getPublishPipes(siteId);
+    }
+
+    /**
      * 新增发布通道
      * 
      * @param cmsPublishpipe 发布通道

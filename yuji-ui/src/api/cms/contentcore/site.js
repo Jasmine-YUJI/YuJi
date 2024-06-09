@@ -42,3 +42,19 @@ export function delSite(siteId) {
     method: 'delete'
   })
 }
+
+// 获取当前站点
+export function getCurrentSite() {
+  return request({
+    url: '/cms/site/getCurrentSite',
+    method: 'get'
+  })
+}
+
+// 设置当前站点
+export function setCurrentSite(siteId) {
+  return request({
+    url: '/cms/site/setCurrentSite/' + siteId,
+    method: 'post'
+  })
+}

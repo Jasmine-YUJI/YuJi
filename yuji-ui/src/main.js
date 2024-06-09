@@ -1,6 +1,7 @@
 import Vue from 'vue'
 
 import Cookies from 'js-cookie'
+import i18n from './i18n';
 
 import Element from 'element-ui'
 import './assets/styles/element-variables.scss'
@@ -73,6 +74,7 @@ DictData.install()
  */
 
 Vue.use(Element, {
+  i18n: (key, value) => i18n.t(key, value),
   size: Cookies.get('size') || 'medium' // set element-ui default size
 })
 
@@ -80,6 +82,7 @@ Vue.config.productionTip = false
 
 new Vue({
   el: '#app',
+  i18n,
   router,
   store,
   render: h => h(App)

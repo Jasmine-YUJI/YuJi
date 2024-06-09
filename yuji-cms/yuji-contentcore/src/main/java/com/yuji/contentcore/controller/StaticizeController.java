@@ -1,5 +1,6 @@
 package com.yuji.contentcore.controller;
 
+import com.yuji.common.core.utils.i18n.I18nUtils;
 import com.yuji.common.core.web.controller.BaseController;
 import com.yuji.common.core.domain.R;
 import com.yuji.common.staticize.func.IFunction;
@@ -28,17 +29,24 @@ public class StaticizeController extends BaseController {
 
 	private final List<IFunction> functions;
 
+	@GetMapping("/aa")
+	public R<?> aa() {
+
+		return R.ok(I18nUtils.get("{FREEMARKER.TAG.DESC.cms_catalog}"));
+	}
+
+
 	/**
 	 * 获取静态化自定义模板标签列表
 	 */
 	@GetMapping("/tags")
 	public R<?> getTemplateTags() {
 		List<TemplateTagVO> list = this.tags.stream().map(tag -> {
-			TemplateTagVO vo = TemplateTagVO.builder().name(tag.getName()).tagName(tag.getTagName())
-					.description(tag.getDescription()).tagAttrs(tag.getTagAttrs()).build();
+			TemplateTagVO vo = TemplateTagVO.builder().name(I18nUtils.get(tag.getName())).tagName(tag.getTagName())
+					.description(I18nUtils.get(tag.getDescription())).tagAttrs(tag.getTagAttrs()).build();
 			vo.getTagAttrs().forEach(attr -> {
-				attr.setName(attr.getName());
-				attr.setUsage(attr.getUsage());
+				attr.setName(I18nUtils.get(attr.getName()));
+				attr.setUsage(I18nUtils.get(attr.getUsage()));
 			});
 			return vo;
 		}).toList();
@@ -52,10 +60,10 @@ public class StaticizeController extends BaseController {
 	public R<?> getTemplateFunctions() {
 		List<TemplateFuncVO> list = this.functions.stream().map(func -> {
 			TemplateFuncVO vo = TemplateFuncVO.builder().funcName(func.getFuncName())
-					.desc(func.getDesc()).funcArgs(func.getFuncArgs()).build();
+					.desc(I18nUtils.get(func.getDesc())).funcArgs(func.getFuncArgs()).build();
 			vo.getFuncArgs().forEach(arg -> {
-				arg.setName(arg.getName());
-				arg.setDesc(arg.getDesc());
+				arg.setName(I18nUtils.get(arg.getName()));
+				arg.setDesc(I18nUtils.get(arg.getDesc()));
 			});
 			vo.setAliases(func.getAliases());
 			return vo;

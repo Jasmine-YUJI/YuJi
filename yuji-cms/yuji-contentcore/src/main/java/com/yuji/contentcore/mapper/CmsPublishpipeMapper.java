@@ -27,6 +27,15 @@ public interface CmsPublishpipeMapper
      */
     public List<CmsPublishpipe> selectCmsPublishpipeList(CmsPublishpipe cmsPublishpipe);
 
+
+    /**
+     * 获取指定站点可用发布通道
+     *
+     * @param siteId 站点ID
+     * @return 结果列表
+     */
+    public List<CmsPublishpipe> getPublishPipes(Long siteId);
+
     /**
      * 新增发布通道
      * 

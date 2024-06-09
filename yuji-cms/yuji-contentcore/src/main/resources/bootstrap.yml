@@ -34,9 +34,9 @@ yuji:
   # 版权年份
   copyrightYear: 2022-2024
   freemarker:
-    templateLoaderPath: E:\yujicms\statics
+    templateLoaderPath: E:\CMSWorkspace\statics
   cms:
-    resourceRoot: E:\yujicms\yuji-cms-wwwroot
+    resourceRoot: E:\CMSWorkspace\wwwroot_release
     publish:
       consumerCount: 1
 # 日志配置

@@ -34,6 +34,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="modifyTime != null "> and modify_time = #{modifyTime}</if>
         </where>
     </select>
+
+    <select id="selectCmsTemplateByTemplateIdInList" parameterType="String" resultMap="CmsTemplateResult">
+        <include refid="selectCmsTemplateVo"/>
+        where template_id in
+        <foreach item="templateId" collection="array" open="(" separator="," close=")">
+            #{templateId}
+        </foreach>
+    </select>
     
     <select id="selectCmsTemplateByTemplateId" parameterType="Long" resultMap="CmsTemplateResult">
         <include refid="selectCmsTemplateVo"/>

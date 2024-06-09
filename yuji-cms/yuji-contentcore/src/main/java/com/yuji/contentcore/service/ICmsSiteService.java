@@ -3,6 +3,8 @@ package com.yuji.contentcore.service;
 import java.util.List;
 import com.yuji.contentcore.domain.CmsSite;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * 站点管理Service接口
  * 
@@ -18,6 +20,12 @@ public interface ICmsSiteService
      * @return 站点管理
      */
     public CmsSite selectCmsSiteBySiteId(Long siteId);
+
+    /**
+     * 获取当前站点，保存在token中
+     */
+    CmsSite getCurrentSite(HttpServletRequest request);
+
 
     /**
      * 查询站点管理列表
