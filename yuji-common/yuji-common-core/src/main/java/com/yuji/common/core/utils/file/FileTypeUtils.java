@@ -6,9 +6,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Objects;
 
+import com.yuji.common.core.utils.DateUtils;
 import com.yuji.common.core.utils.StringUtils;
+import com.yuji.common.core.utils.uuid.Seq;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.HtmlUtils;
 
 /**
  * 文件类型工具类
@@ -66,6 +69,33 @@ public class FileTypeUtils
             extension = MimeTypeUtils.getExtension(Objects.requireNonNull(file.getContentType()));
         }
         return extension;
+    }
+
+    /**
+     * 读取指定字符串的后缀名
+     *
+     * @param path 文路径
+     * @return 后缀名
+     */
+    public static String getExtension(String path) {
+        if (path.contains("://")) {
+            path = HtmlUtils.htmlUnescape(path);
+            String queryString = StringUtils.substringAfter(path, "?");
+            if (queryString.contains("wx_fmt=")) {
+                // 微信图片路径处理
+                String ext = StringUtils.substringAfter(queryString, "wx_fmt=");
+                if (ext.contains("&")) {
+                    ext = StringUtils.substringBefore(ext, "&");
+                }
+                if (StringUtils.isNotEmpty(ext)) {
+                    return ext;
+                }
+            }
+        }
+        if (path.contains("?")) {
+            path = StringUtils.substringBefore(path, "?");
+        }
+        return FilenameUtils.getExtension(path);
     }
 
     /**
@@ -130,5 +160,14 @@ public class FileTypeUtils
                 throw new RuntimeException("Create directory failed: " + path, e);
             }
         }
+    }
+
+    /**
+     * 编码文件名
+     */
+    public static final String extractFilename(MultipartFile file)
+    {
+        return StringUtils.format("{}/{}_{}.{}", DateUtils.datePath(),
+                FilenameUtils.getBaseName(file.getOriginalFilename()), Seq.getId(Seq.uploadSeqType), FileTypeUtils.getExtension(file));
     }
 }

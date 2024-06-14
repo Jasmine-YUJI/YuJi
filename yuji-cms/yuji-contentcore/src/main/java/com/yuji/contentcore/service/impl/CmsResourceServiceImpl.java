@@ -1,7 +1,36 @@
 package com.yuji.contentcore.service.impl;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import com.yuji.common.core.exception.CommonErrorCode;
+import com.yuji.common.core.utils.Assert;
 import com.yuji.common.core.utils.DateUtils;
+import com.yuji.common.core.utils.StringUtils;
+import com.yuji.common.core.utils.file.FileTypeUtils;
+import com.yuji.common.core.utils.uuid.IdUtils;
+import com.yuji.common.file.IFileStorageType;
+import com.yuji.common.file.StorageWriteArgs;
+import com.yuji.common.file.StorageWriteArgs.StorageWriteArgsBuilder;
+import com.yuji.common.file.exception.StorageErrorCode;
+import com.yuji.common.file.local.LocalFileStorageType;
+import com.yuji.contentcore.core.IResourceType;
+import com.yuji.contentcore.core.impl.InternalDataType_Resource;
+import com.yuji.contentcore.domain.CmsSite;
+import com.yuji.contentcore.domain.dto.ResourceUploadDTO;
+import com.yuji.contentcore.exception.ContentCoreErrorCode;
+import com.yuji.contentcore.fixed.dict.EnableOrDisable;
+import com.yuji.contentcore.mapper.CmsSiteMapper;
+import com.yuji.contentcore.properties.FileStorageArgsProperty;
+import com.yuji.contentcore.properties.FileStorageArgsProperty.FileStorageArgs;
+import com.yuji.contentcore.properties.FileStorageTypeProperty;
+import com.yuji.contentcore.utils.ResourceUtils;
+import com.yuji.contentcore.utils.SiteUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.yuji.contentcore.mapper.CmsResourceMapper;
@@ -19,6 +48,13 @@ public class CmsResourceServiceImpl implements ICmsResourceService
 {
     @Autowired
     private CmsResourceMapper cmsResourceMapper;
+
+    @Autowired
+    private CmsSiteMapper cmsSiteMapper;
+
+    @Autowired
+    private Map<String, IFileStorageType> fileStorageTypes;
+
 
     /**
      * 查询资源
@@ -47,27 +83,74 @@ public class CmsResourceServiceImpl implements ICmsResourceService
     /**
      * 新增资源
      * 
-     * @param cmsResource 资源
+     * @param dto 资源
      * @return 结果
      */
     @Override
-    public int insertCmsResource(CmsResource cmsResource)
+    public CmsResource insertCmsResource(ResourceUploadDTO dto) throws IOException
     {
+        String suffix = FileTypeUtils.getExtension(Objects.requireNonNull(dto.getFile().getOriginalFilename()));
+        IResourceType resourceType = ResourceUtils.getResourceTypeBySuffix(suffix);
+        Assert.notNull(resourceType, () -> ContentCoreErrorCode.UNSUPPORTED_RESOURCE_TYPE.exception(suffix));
+
+        CmsResource cmsResource = new CmsResource();
+        cmsResource.setResourceId(IdUtils.getSnowflakeId());
+        cmsResource.setSiteId(dto.getSite().getSiteId());
+        cmsResource.setResourceType(resourceType.getId());
+        cmsResource.setFileName(dto.getFile().getOriginalFilename());
+        cmsResource.setName(StringUtils.isEmpty(dto.getName()) ? dto.getFile().getOriginalFilename() : dto.getName());
+        cmsResource.setSuffix(suffix);
+
+        String siteResourceRoot = SiteUtils.getSiteResourceRoot(dto.getSite());
+        String fileName = cmsResource.getResourceId() + StringUtils.DOT + suffix;
+        String dir = resourceType.getUploadPath()
+                + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd")) + StringUtils.SLASH;
+        FileTypeUtils.mkdirs(siteResourceRoot + dir);
+
+        cmsResource.setPath(dir + fileName);
+        cmsResource.setStatus(EnableOrDisable.ENABLE);
+        cmsResource.setCreateBy(dto.getOperator());
+        cmsResource.setRemark(dto.getRemark());
         cmsResource.setCreateTime(DateUtils.getNowDate());
-        return cmsResourceMapper.insertCmsResource(cmsResource);
+        // 处理资源
+        this.processResource(cmsResource, resourceType, dto.getSite(), dto.getFile().getBytes());
+        cmsResourceMapper.insertCmsResource(cmsResource);
+        return cmsResource;
     }
 
     /**
      * 修改资源
      * 
-     * @param cmsResource 资源
+     * @param dto 资源
      * @return 结果
      */
     @Override
-    public int updateCmsResource(CmsResource cmsResource)
+    public CmsResource updateCmsResource(ResourceUploadDTO dto) throws IOException
     {
+        String suffix = FileTypeUtils.getExtension(Objects.requireNonNull(dto.getFile().getOriginalFilename()));
+        IResourceType resourceType = ResourceUtils.getResourceTypeBySuffix(suffix);
+        Assert.notNull(resourceType, () -> ContentCoreErrorCode.UNSUPPORTED_RESOURCE_TYPE.exception(suffix));
+
+        CmsResource cmsResource = cmsResourceMapper.selectCmsResourceByResourceId(dto.getResourceId());
+        Assert.notNull(cmsResource, () -> CommonErrorCode.DATA_NOT_FOUND_BY_ID.exception("resourceId", dto.getResourceId()));
+
+        cmsResource.setResourceType(resourceType.getId());
+        cmsResource.setFileName(dto.getFile().getOriginalFilename());
+        cmsResource.setName(StringUtils.isEmpty(dto.getName()) ? dto.getFile().getOriginalFilename() : dto.getName());
+        cmsResource.setSuffix(suffix);
+
+        String fileName = cmsResource.getResourceId() + StringUtils.DOT + suffix;
+        String path = StringUtils.substringBeforeLast(cmsResource.getPath(), "/") + fileName;
+
+        cmsResource.setPath(path);
+        cmsResource.setUpdateBy(dto.getOperator());
+        cmsResource.setRemark(dto.getRemark());
         cmsResource.setUpdateTime(DateUtils.getNowDate());
-        return cmsResourceMapper.updateCmsResource(cmsResource);
+
+        // 处理资源
+        this.processResource(cmsResource, resourceType, dto.getSite(), dto.getFile().getBytes());
+        cmsResourceMapper.updateCmsResource(cmsResource);
+        return cmsResource;
     }
 
     /**
@@ -92,5 +175,43 @@ public class CmsResourceServiceImpl implements ICmsResourceService
     public int deleteCmsResourceByResourceId(Long resourceId)
     {
         return cmsResourceMapper.deleteCmsResourceByResourceId(resourceId);
+    }
+
+    @Override
+    public String getResourceLink(CmsResource resource, boolean isPreview) {
+        CmsSite site = cmsSiteMapper.selectCmsSiteBySiteId(resource.getSiteId());
+        String prefix = ResourceUtils.getResourcePrefix(resource.getStorageType(), site, isPreview);
+        return prefix + resource.getPath();
+    }
+
+    private void processResource(CmsResource cmsResource, IResourceType resourceType, CmsSite site, byte[] bytes) throws IOException {
+        // 处理资源，图片属性读取、水印等
+        bytes = resourceType.process(cmsResource, bytes);
+        // 写入磁盘/OSS
+        String fileStorageType = FileStorageTypeProperty.getValue(site.getConfigProps());
+        IFileStorageType fst = this.getFileStorageType(fileStorageType);
+        FileStorageArgs fileStorageArgs = FileStorageArgsProperty.getValue(site.getConfigProps());
+        // 写入参数设置
+        StorageWriteArgsBuilder builder = StorageWriteArgs.builder();
+        builder.bucket(fileStorageArgs.getBucket());
+        if (LocalFileStorageType.TYPE.equals(fst.getType())) {
+            builder.bucket(SiteUtils.getSiteResourceRoot(site));
+        } else {
+            builder.accessKey(fileStorageArgs.getAccessKey());
+            builder.accessSecret(fileStorageArgs.getAccessSecret());
+            builder.endpoint(fileStorageArgs.getEndpoint());
+        }
+        builder.path(cmsResource.getPath());
+        builder.inputStream(new ByteArrayInputStream(bytes));
+        fst.write(builder.build());
+        cmsResource.setStorageType(fst.getType());
+        // 内部链接
+        cmsResource.setInternalUrl(InternalDataType_Resource.getInternalUrl(cmsResource));
+    }
+
+    private IFileStorageType getFileStorageType(String type) {
+        IFileStorageType fileStorageType = fileStorageTypes.get(IFileStorageType.BEAN_NAME_PREIFX + type);
+        Assert.notNull(fileStorageType, () -> StorageErrorCode.UNSUPPORTED_STORAGE_TYPE.exception(type));
+        return fileStorageType;
     }
 }

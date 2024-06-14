@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 
 import com.yuji.common.core.utils.ServletUtils;
+import com.yuji.common.security.utils.SecurityUtils;
 import com.yuji.contentcore.domain.CmsSite;
 import com.yuji.contentcore.domain.dto.PublishPipeProp;
 import com.yuji.contentcore.service.ICmsSiteService;
@@ -50,22 +51,11 @@ public class CmsPublishpipeController extends BaseController
     @GetMapping("/list")
     public TableDataInfo list(CmsPublishpipe cmsPublishpipe)
     {
+        CmsSite site = this.siteService.getCurrentSite(ServletUtils.getRequest());
+        cmsPublishpipe.setSiteId(site.getSiteId());
         startPage();
         List<CmsPublishpipe> list = cmsPublishpipeService.selectCmsPublishpipeList(cmsPublishpipe);
         return getDataTable(list);
-    }
-
-    /**
-     * 导出发布通道列表
-     */
-    @RequiresPermissions("cms:publishpipe:export")
-    @Log(title = "发布通道", businessType = BusinessType.EXPORT)
-    @PostMapping("/export")
-    public void export(HttpServletResponse response, CmsPublishpipe cmsPublishpipe)
-    {
-        List<CmsPublishpipe> list = cmsPublishpipeService.selectCmsPublishpipeList(cmsPublishpipe);
-        ExcelUtil<CmsPublishpipe> util = new ExcelUtil<CmsPublishpipe>(CmsPublishpipe.class);
-        util.exportExcel(response, list, "发布通道数据");
     }
 
     /**
@@ -82,10 +72,13 @@ public class CmsPublishpipeController extends BaseController
      * 新增发布通道
      */
     @RequiresPermissions("cms:publishpipe:add")
-    @Log(title = "发布通道", businessType = BusinessType.INSERT)
+    @Log(title = "新增发布通道", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult add(@RequestBody CmsPublishpipe cmsPublishpipe)
     {
+        CmsSite site = this.siteService.getCurrentSite(ServletUtils.getRequest());
+        cmsPublishpipe.setSiteId(site.getSiteId());
+        cmsPublishpipe.setCreateBy(SecurityUtils.getLoginUser().getUsername());
         return toAjax(cmsPublishpipeService.insertCmsPublishpipe(cmsPublishpipe));
     }
 
@@ -93,10 +86,11 @@ public class CmsPublishpipeController extends BaseController
      * 修改发布通道
      */
     @RequiresPermissions("cms:publishpipe:edit")
-    @Log(title = "发布通道", businessType = BusinessType.UPDATE)
+    @Log(title = "修改发布通道", businessType = BusinessType.UPDATE)
     @PutMapping
     public AjaxResult edit(@RequestBody CmsPublishpipe cmsPublishpipe)
     {
+        cmsPublishpipe.setUpdateBy(SecurityUtils.getLoginUser().getUsername());
         return toAjax(cmsPublishpipeService.updateCmsPublishpipe(cmsPublishpipe));
     }
 
@@ -104,7 +98,7 @@ public class CmsPublishpipeController extends BaseController
      * 删除发布通道
      */
     @RequiresPermissions("cms:publishpipe:remove")
-    @Log(title = "发布通道", businessType = BusinessType.DELETE)
+    @Log(title = "删除发布通道", businessType = BusinessType.DELETE)
 	@DeleteMapping("/{publishpipeIds}")
     public AjaxResult remove(@PathVariable Long[] publishpipeIds)
     {

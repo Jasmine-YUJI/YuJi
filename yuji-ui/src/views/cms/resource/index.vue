@@ -1,234 +1,177 @@
 <template>
   <div class="app-container">
-    <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="站点id" prop="siteId">
-        <el-input
-          v-model="queryParams.siteId"
-          placeholder="请输入站点id"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="资源名称" prop="name">
-        <el-input
-          v-model="queryParams.name"
-          placeholder="请输入资源名称"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="文件保存相对路径" prop="path">
-        <el-input
-          v-model="queryParams.path"
-          placeholder="请输入文件保存相对路径"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="文件名称" prop="fileName">
-        <el-input
-          v-model="queryParams.fileName"
-          placeholder="请输入文件名称"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="后缀名，不带." prop="suffix">
-        <el-input
-          v-model="queryParams.suffix"
-          placeholder="请输入后缀名，不带."
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="宽" prop="width">
-        <el-input
-          v-model="queryParams.width"
-          placeholder="请输入宽"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="高" prop="height">
-        <el-input
-          v-model="queryParams.height"
-          placeholder="请输入高"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="文件大小" prop="fileSize">
-        <el-input
-          v-model="queryParams.fileSize"
-          placeholder="请输入文件大小"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="来源地址" prop="sourceUrl">
-        <el-input
-          v-model="queryParams.sourceUrl"
-          placeholder="请输入来源地址"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="引用关系" prop="usageInfo">
-        <el-input
-          v-model="queryParams.usageInfo"
-          placeholder="请输入引用关系"
-          clearable
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" icon="el-icon-search" size="mini" @click="handleQuery">搜索</el-button>
-        <el-button icon="el-icon-refresh" size="mini" @click="resetQuery">重置</el-button>
-      </el-form-item>
-    </el-form>
-
-    <el-row :gutter="10" class="mb8">
-      <el-col :span="1.5">
-        <el-button
-          type="primary"
-          plain
-          icon="el-icon-plus"
-          size="mini"
-          @click="handleAdd"
-          v-hasPermi="['cms:resource:add']"
-        >新增</el-button>
+    <el-row :gutter="24" class="mb12">
+      <el-col :span="8">
+        <el-row :gutter="10">
+          <el-col :span="1.5">
+            <el-button
+              plain
+              type="primary"
+              icon="el-icon-plus"
+              size="mini"
+              @click="handleAdd">{{ $t("Common.Add") }}</el-button>
+          </el-col>
+          <el-col :span="1.5">
+            <el-button
+              plain
+              type="success"
+              icon="el-icon-edit"
+              size="mini"
+              :disabled="single"
+              @click="handleUpdate">{{ $t("Common.Edit") }}</el-button>
+          </el-col>
+          <el-col :span="1.5">
+            <el-button
+              plain
+              type="danger"
+              icon="el-icon-delete"
+              size="mini"
+              :disabled="multiple"
+              @click="handleDelete">{{ $t("Common.Delete") }}</el-button>
+          </el-col>
+        </el-row>
       </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="success"
-          plain
-          icon="el-icon-edit"
+      <el-col :span="16">
+        <el-form
+          :model="queryParams"
+          ref="queryForm"
+          :inline="true"
           size="mini"
-          :disabled="single"
-          @click="handleUpdate"
-          v-hasPermi="['cms:resource:edit']"
-        >修改</el-button>
+          style="text-align:right"
+          class="el-form-search">
+          <el-form-item prop="name">
+            <el-input :placeholder="$t('CMS.Resource.Name')" v-model="queryParams.name">
+              <el-select v-model="queryParams.resourceType" slot="prepend" :placeholder="$t('CMS.Resource.Type')" style="width:80px;">
+                <el-option
+                  v-for="rt in resourceTypes"
+                  :key="rt.id"
+                  :label="rt.name"
+                  :value="rt.id"
+                />
+              </el-select>
+            </el-input>
+          </el-form-item>
+          <el-form-item :label="$t('Common.CreateTime')">
+            <el-date-picker
+              v-model="dateRange"
+              style="width: 240px"
+              value-format="yyyy-MM-dd"
+              type="daterange"
+              range-separator="-"
+              :start-placeholder="$t('Common.BeginDate')"
+              :end-placeholder="$t('Common.EndDate')"
+            ></el-date-picker>
+          </el-form-item>
+          <el-form-item>
+            <el-button-group>
+              <el-button
+                type="primary"
+                icon="el-icon-search"
+                @click="handleQuery">{{ $t("Common.Search") }}</el-button>
+              <el-button
+                icon="el-icon-refresh"
+                @click="resetQuery">{{ $t("Common.Reset") }}</el-button>
+            </el-button-group>
+          </el-form-item>
+        </el-form>
       </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="danger"
-          plain
-          icon="el-icon-delete"
-          size="mini"
-          :disabled="multiple"
-          @click="handleDelete"
-          v-hasPermi="['cms:resource:remove']"
-        >删除</el-button>
-      </el-col>
-      <el-col :span="1.5">
-        <el-button
-          type="warning"
-          plain
-          icon="el-icon-download"
-          size="mini"
-          @click="handleExport"
-          v-hasPermi="['cms:resource:export']"
-        >导出</el-button>
-      </el-col>
-      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="resourceList" @selection-change="handleSelectionChange">
+    <el-table v-loading="loading" size="small" :data="resourceList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="id" align="center" prop="resourceId" />
-      <el-table-column label="站点id" align="center" prop="siteId" />
-      <el-table-column label="资源类型" align="center" prop="resourceType" />
-      <el-table-column label="存储类型" align="center" prop="storageType" />
-      <el-table-column label="资源名称" align="center" prop="name" />
-      <el-table-column label="文件保存相对路径" align="center" prop="path" />
-      <el-table-column label="文件名称" align="center" prop="fileName" />
-      <el-table-column label="后缀名，不带." align="center" prop="suffix" />
-      <el-table-column label="宽" align="center" prop="width" />
-      <el-table-column label="高" align="center" prop="height" />
-      <el-table-column label="文件大小" align="center" prop="fileSize" />
-      <el-table-column label="来源地址" align="center" prop="sourceUrl" />
-      <el-table-column label="状态" align="center" prop="status" />
-      <el-table-column label="引用关系" align="center" prop="usageInfo" />
-      <el-table-column label="备注" align="center" prop="remark" />
-      <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
+      <el-table-column label="ID" prop="resourceId" align="center" width="180" />
+      <el-table-column :label="$t('CMS.Resource.Type')" prop="resourceTypeName" width="80" />
+      <el-table-column :label="$t('CMS.Resource.Name')" prop="name" align="left">
+        <template slot-scope="scope">
+          <svg-icon :icon-class="scope.row.iconClass" /> <el-link type="primary" target="_blank" :href="scope.row.src">{{ scope.row.name }}</el-link>
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('CMS.Resource.StorageType')" prop="storageType" align="center" width="120" />
+      <el-table-column :label="$t('CMS.Resource.FileSize')" prop="fileSizeName" align="center" width="120" />
+      <el-table-column :label="$t('Common.CreateTime')" prop="createTime" align="center" width="180">
+        <template slot-scope="scope">
+          <span>{{ parseTime(scope.row.createTime) }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column
+        :label="$t('Common.Operation')"
+        align="center"
+        width="180"
+        class-name="small-padding fixed-width">
         <template slot-scope="scope">
           <el-button
-            size="mini"
+            size="small"
             type="text"
             icon="el-icon-edit"
-            @click="handleUpdate(scope.row)"
-            v-hasPermi="['cms:resource:edit']"
-          >修改</el-button>
+            @click="handleUpdate(scope.row)">{{ $t("Common.Edit") }}</el-button>
           <el-button
-            size="mini"
+            size="small"
             type="text"
             icon="el-icon-delete"
-            @click="handleDelete(scope.row)"
-            v-hasPermi="['cms:resource:remove']"
-          >删除</el-button>
+            @click="handleDelete(scope.row)">{{ $t("Common.Delete") }}</el-button>
         </template>
       </el-table-column>
     </el-table>
-
     <pagination
       v-show="total>0"
       :total="total"
       :page.sync="queryParams.pageNum"
       :limit.sync="queryParams.pageSize"
-      @pagination="getList"
-    />
+      @pagination="getList" />
 
     <!-- 添加或修改资源对话框 -->
-    <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
-      <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="站点id" prop="siteId">
-          <el-input v-model="form.siteId" placeholder="请输入站点id" />
+    <el-dialog
+      :title="title"
+      :visible.sync="open"
+      width="500px"
+      append-to-body>
+      <el-form
+        ref="form"
+        :model="form"
+        :rules="rules"
+        label-width="80px">
+        <el-form-item :label="$t('CMS.Resource.UploadResource')">
+          <el-upload
+            ref="upload"
+            drag
+            :data="form"
+            :action="upload.url"
+            :headers="upload.headers"
+            :file-list="upload.fileList"
+            :on-progress="handleFileUploadProgress"
+            :on-success="handleFileSuccess"
+            :auto-upload="false"
+            :before-upload="handleBeforeUpload"
+            :on-change="handleUploadChange"
+            :limit="1">
+              <i class="el-icon-upload"></i>
+              <div class="el-upload__text">{{ $t('CMS.Resource.UploadTip1') }}</div>
+              <div class="el-upload__tip" slot="tip">{{ $t('CMS.Resource.UploadTip2', [ '[.jpg, .png]',  '500kb']) }}</div>
+            </el-upload>
         </el-form-item>
-        <el-form-item label="资源名称" prop="name">
-          <el-input v-model="form.name" placeholder="请输入资源名称" />
+        <el-form-item :label="$t('CMS.Resource.Name')" prop="name">
+          <el-input v-model="form.name" />
         </el-form-item>
-        <el-form-item label="文件保存相对路径" prop="path">
-          <el-input v-model="form.path" placeholder="请输入文件保存相对路径" />
-        </el-form-item>
-        <el-form-item label="文件名称" prop="fileName">
-          <el-input v-model="form.fileName" placeholder="请输入文件名称" />
-        </el-form-item>
-        <el-form-item label="后缀名，不带." prop="suffix">
-          <el-input v-model="form.suffix" placeholder="请输入后缀名，不带." />
-        </el-form-item>
-        <el-form-item label="宽" prop="width">
-          <el-input v-model="form.width" placeholder="请输入宽" />
-        </el-form-item>
-        <el-form-item label="高" prop="height">
-          <el-input v-model="form.height" placeholder="请输入高" />
-        </el-form-item>
-        <el-form-item label="文件大小" prop="fileSize">
-          <el-input v-model="form.fileSize" placeholder="请输入文件大小" />
-        </el-form-item>
-        <el-form-item label="来源地址" prop="sourceUrl">
-          <el-input v-model="form.sourceUrl" placeholder="请输入来源地址" />
-        </el-form-item>
-        <el-form-item label="引用关系" prop="usageInfo">
-          <el-input v-model="form.usageInfo" placeholder="请输入引用关系" />
-        </el-form-item>
-        <el-form-item label="备注" prop="remark">
-          <el-input v-model="form.remark" placeholder="请输入备注" />
+        <el-form-item :label="$t('Common.Remark')" prop="remark">
+          <el-input v-model="form.remark" type="textarea" />
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>
-        <el-button @click="cancel">取 消</el-button>
+      <div slot="footer"
+           class="dialog-footer">
+        <el-button type="primary" :loading="upload.isUploading" @click="submitForm">{{ $t("Common.Confirm") }}</el-button>
+        <el-button @click="cancel">{{ $t("Common.Cancel") }}</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
-
 <script>
-import { listResource, getResource, delResource, addResource, updateResource } from "@/api/cms/contentcore/resource";
+import { getFileSvgIconClass } from "@/utils/yuji";
+import { getToken } from "@/utils/auth";
+import { getResourceTypes, getResrouceList, getResourceDetail, delResource } from "@/api/cms/contentcore/resource";
 
 export default {
-  name: "Resource",
-  data() {
+  name: "CmsResource",
+  data () {
     return {
       // 遮罩层
       loading: true,
@@ -238,8 +181,6 @@ export default {
       single: true,
       // 非多个禁用
       multiple: true,
-      // 显示搜索条件
-      showSearch: true,
       // 总条数
       total: 0,
       // 资源表格数据
@@ -248,174 +189,152 @@ export default {
       title: "",
       // 是否显示弹出层
       open: false,
+      dateRange: [],
       // 查询参数
       queryParams: {
         pageNum: 1,
-        pageSize: 10,
-        siteId: null,
-        resourceType: null,
-        storageType: null,
-        name: null,
-        path: null,
-        fileName: null,
-        suffix: null,
-        width: null,
-        height: null,
-        fileSize: null,
-        sourceUrl: null,
-        status: null,
-        usageInfo: null,
+        pageSize: 15,
+        resourceType: undefined,
+        name: undefined,
+        beginTime: undefined,
+        endTime: undefined
       },
+      resourceTypes: [],
       // 表单参数
       form: {},
       // 表单校验
       rules: {
-        siteId: [
-          { required: true, message: "站点id不能为空", trigger: "blur" }
-        ],
-        resourceType: [
-          { required: true, message: "资源类型不能为空", trigger: "change" }
-        ],
-        storageType: [
-          { required: true, message: "存储类型不能为空", trigger: "change" }
-        ],
         name: [
-          { required: true, message: "资源名称不能为空", trigger: "blur" }
-        ],
-        path: [
-          { required: true, message: "文件保存相对路径不能为空", trigger: "blur" }
-        ],
-        fileName: [
-          { required: true, message: "文件名称不能为空", trigger: "blur" }
-        ],
-        suffix: [
-          { required: true, message: "后缀名，不带.不能为空", trigger: "blur" }
-        ],
-        fileSize: [
-          { required: true, message: "文件大小不能为空", trigger: "blur" }
-        ],
-        status: [
-          { required: true, message: "状态不能为空", trigger: "change" }
-        ],
-        createBy: [
-          { required: true, message: "创建人不能为空", trigger: "blur" }
-        ],
-        createTime: [
-          { required: true, message: "创建时间不能为空", trigger: "blur" }
-        ],
-      }
+          { required: true, message: this.$t('CMS.Resource.RuleTips.Name'), trigger: "blur" }
+        ]
+      },
+      // 上传参数
+      upload: {
+        // 是否禁用上传
+        isUploading: false,
+        // 设置上传的请求头部
+        headers: { Authorization: "Bearer " + getToken(), CurrentSite: this.$cache.local.get("CurrentSite") },
+        // 上传的地址
+        url: process.env.VUE_APP_BASE_API + "/cms/resource",
+        // 上传的文件列表
+        fileList: [],
+        data: {}
+      },
     };
   },
-  created() {
+  created () {
+    this.loadResourceTypes();
     this.getList();
   },
   methods: {
+    loadResourceTypes() {
+      getResourceTypes().then(response => {
+        this.resourceTypes = response.data;
+      });
+    },
     /** 查询资源列表 */
-    getList() {
+    getList () {
       this.loading = true;
-      listResource(this.queryParams).then(response => {
+      if (this.dateRange && this.dateRange.length == 2) {
+        this.queryParams.beginTime = this.dateRange[0];
+        this.queryParams.endTime = this.dateRange[1];
+      }
+      getResrouceList(this.queryParams).then(response => {
         this.resourceList = response.rows;
-        this.total = response.total;
+        this.resourceList.forEach(r => r.iconClass = getFileSvgIconClass(r.name))
+        this.total = parseInt(response.total);
         this.loading = false;
       });
     },
     // 取消按钮
-    cancel() {
+    cancel () {
       this.open = false;
       this.reset();
     },
     // 表单重置
-    reset() {
+    reset () {
       this.form = {
-        resourceId: null,
-        siteId: null,
-        resourceType: null,
-        storageType: null,
-        name: null,
-        path: null,
-        fileName: null,
-        suffix: null,
-        width: null,
-        height: null,
-        fileSize: null,
-        sourceUrl: null,
-        status: null,
-        usageInfo: null,
-        createBy: null,
-        createTime: null,
-        updateBy: null,
-        updateTime: null,
-        remark: null
+        name: "",
+        remark: ""
       };
       this.resetForm("form");
     },
     /** 搜索按钮操作 */
-    handleQuery() {
+    handleQuery () {
       this.queryParams.pageNum = 1;
       this.getList();
     },
     /** 重置按钮操作 */
-    resetQuery() {
+    resetQuery () {
       this.resetForm("queryForm");
+      this.queryParams.resourceType = undefined;
+      this.dateRange = [];
       this.handleQuery();
     },
     // 多选框选中数据
-    handleSelectionChange(selection) {
+    handleSelectionChange (selection) {
       this.ids = selection.map(item => item.resourceId)
-      this.single = selection.length!==1
+      this.single = selection.length != 1
       this.multiple = !selection.length
     },
     /** 新增按钮操作 */
-    handleAdd() {
+    handleAdd () {
       this.reset();
       this.open = true;
-      this.title = "添加资源";
+      this.title = this.$t('CMS.Resource.AddDialogTitle');
     },
     /** 修改按钮操作 */
-    handleUpdate(row) {
+    handleUpdate (row) {
       this.reset();
       const resourceId = row.resourceId || this.ids
-      getResource(resourceId).then(response => {
+      getResourceDetail(resourceId).then(response => {
         this.form = response.data;
+        this.title = this.$t('CMS.Resource.EditDialogTitle');
         this.open = true;
-        this.title = "修改资源";
       });
     },
+    handleFileUploadProgress(event, file, fileList) {
+      this.upload.isUploading = true;
+    },
+    handleFileSuccess(response, file, fileList) {
+      this.upload.isUploading = false;
+        this.$modal.msgSuccess(response.msg);
+      if (response.code == 200) {
+        this.open = false;
+        this.getList();
+      }
+      this.$refs.upload.clearFiles();
+      this.resetForm("form");
+    },
+    handleUploadChange(file) {
+      file.name = file.name.toLowerCase();
+      // if (!file.name.endsWith(".png") && !file.name.endsWith(".jpg")) {
+      //   this.$modal.msgError(this.$t('CMS.Resource.FileTypeErrMsg'));
+      //   this.upload.fileList = [];
+      //   return;
+      // }
+      this.form.name = file.name;
+    },
+    handleBeforeUpload(file) {
+      return true;
+    },
     /** 提交按钮 */
-    submitForm() {
+    submitForm: function () {
       this.$refs["form"].validate(valid => {
         if (valid) {
-          if (this.form.resourceId != null) {
-            updateResource(this.form).then(response => {
-              this.$modal.msgSuccess("修改成功");
-              this.open = false;
-              this.getList();
-            });
-          } else {
-            addResource(this.form).then(response => {
-              this.$modal.msgSuccess("新增成功");
-              this.open = false;
-              this.getList();
-            });
-          }
+          this.$refs.upload.submit();
         }
       });
     },
     /** 删除按钮操作 */
-    handleDelete(row) {
+    handleDelete (row) {
       const resourceIds = row.resourceId || this.ids;
-      this.$modal.confirm('是否确认删除资源编号为"' + resourceIds + '"的数据项？').then(function() {
+      this.$modal.confirm(this.$t('Common.ConfirmDelete')).then(function () {
         return delResource(resourceIds);
       }).then(() => {
         this.getList();
-        this.$modal.msgSuccess("删除成功");
-      }).catch(() => {});
-    },
-    /** 导出按钮操作 */
-    handleExport() {
-      this.download('cms/resource/export', {
-        ...this.queryParams
-      }, `resource_${new Date().getTime()}.xlsx`)
+        this.$modal.msgSuccess(this.$t('Common.DeleteSuccess'));
+      }).catch(function () { });
     }
   }
 };

@@ -43,6 +43,14 @@ public interface ICmsPublishpipeService
     public List<CmsPublishpipe> getPublishPipes(Long siteId);
 
     /**
+     * 获取指定站点所有发布通道
+     *
+     * @param siteId 站点ID
+     * @return 结果列表
+     */
+    public List<CmsPublishpipe> getAllPublishPipes(Long siteId);
+
+    /**
      * 新增发布通道
      * 
      * @param cmsPublishpipe 发布通道

@@ -31,14 +31,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="state != null  and state != ''"> and state = #{state}</if>
             <if test="sort != null "> and sort = #{sort}</if>
         </where>
-    </select>
-
-    <select id="getPublishPipes" parameterType="Long" resultMap="CmsPublishpipeResult">
-        <include refid="selectCmsPublishpipeVo"/>
-        where site_id = #{siteId}
         ORDER BY sort
     </select>
-    
+
     <select id="selectCmsPublishpipeByPublishpipeId" parameterType="Long" resultMap="CmsPublishpipeResult">
         <include refid="selectCmsPublishpipeVo"/>
         where publishpipe_id = #{publishpipeId}

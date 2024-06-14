@@ -1,9 +1,16 @@
 package com.yuji.system.controller;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 
+import com.yuji.common.core.domain.StroageArgs;
+import com.yuji.common.core.enums.FileType;
+import com.yuji.common.core.utils.DateUtils;
 import com.yuji.common.core.utils.IP2RegionUtils;
+import com.yuji.system.config.SystemConfig;
 import com.yuji.system.domain.vo.DashboardUserVO;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -126,8 +133,7 @@ public class SysProfileController extends BaseController
      */
     @Log(title = "用户头像", businessType = BusinessType.UPDATE)
     @PostMapping("/avatar")
-    public AjaxResult avatar(@RequestParam("avatarfile") MultipartFile file)
-    {
+    public AjaxResult avatar(@RequestParam("avatarfile") MultipartFile file) throws IOException {
         if (!file.isEmpty())
         {
             LoginUser loginUser = SecurityUtils.getLoginUser();
@@ -136,18 +142,18 @@ public class SysProfileController extends BaseController
             {
                 return error("文件格式不正确，请上传" + Arrays.toString(MimeTypeUtils.IMAGE_EXTENSION) + "格式");
             }
-            R<SysFile> fileResult = remoteFileService.upload(file);
-            if (StringUtils.isNull(fileResult) || StringUtils.isNull(fileResult.getData()))
-            {
-                return error("文件服务异常，请联系管理员");
-            }
-            String url = fileResult.getData().getUrl();
-            if (userService.updateUserAvatar(loginUser.getUsername(), url))
+            String filename = FileTypeUtils.extractFilename(file);
+
+            // 上传相对路径
+            String path = "avatar/" + filename;
+            // 写入文件
+            FileUtils.writeByteArrayToFile(new File(SystemConfig.getUploadDir() + path), file.getBytes());
+            if (userService.updateUserAvatar(loginUser.getUsername(), path))
             {
                 AjaxResult ajax = AjaxResult.success();
-                ajax.put("imgUrl", url);
+                ajax.put("imgUrl", SystemConfig.getResourcePrefix() + path);
                 // 更新缓存用户头像
-                loginUser.getSysUser().setAvatar(url);
+                loginUser.getSysUser().setAvatar(path);
                 tokenService.setLoginUser(loginUser);
                 return ajax;
             }
@@ -168,7 +174,9 @@ public class SysProfileController extends BaseController
         vo.setLastLoginTime(user.getLoginDate());
         vo.setLastLoginIp(user.getLoginIp());
         vo.setLastLoginAddr(IP2RegionUtils.ip2Region(user.getLoginIp()));
-        vo.setAvatar(user.getAvatar());
+        if (StringUtils.isNotEmpty(user.getAvatar())) {
+            vo.setAvatar(SystemConfig.getResourcePrefix() + user.getAvatar());
+        }
         vo.setDeptName(user.getDept().getDeptName());
         return R.ok(vo);
     }

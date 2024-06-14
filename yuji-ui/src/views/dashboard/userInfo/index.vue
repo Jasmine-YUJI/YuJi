@@ -37,9 +37,9 @@ export default {
     loadUserInfo() {
       getHomeUserInfo().then(response => {
         this.userInfo = response.data;
-        /*if (this.userInfo.avatar && this.userInfo.avatar != '') {
+        if (this.userInfo.avatar && this.userInfo.avatar != '') {
           this.userInfo.avatar = process.env.VUE_APP_BASE_API + this.userInfo.avatar;
-        }*/
+        }
       })
     }
   }

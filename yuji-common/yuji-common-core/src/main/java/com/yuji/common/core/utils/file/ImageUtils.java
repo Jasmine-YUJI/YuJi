@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Arrays;
+
+import com.yuji.common.core.utils.StringUtils;
 import org.apache.poi.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,5 +82,11 @@ public class ImageUtils
         {
             IOUtils.closeQuietly(in);
         }
+    }
+
+    public static String getThumbnailFileName(String fileName, int width, int height) {
+        String prefix = StringUtils.substringBeforeLast(fileName, ".");
+        String suffix = StringUtils.substringAfterLast(fileName, ".");
+        return prefix + "_" + width + "x" + height + "." + suffix;
     }
 }

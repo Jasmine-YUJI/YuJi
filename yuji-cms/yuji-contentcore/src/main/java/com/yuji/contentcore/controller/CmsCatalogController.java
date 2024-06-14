@@ -3,6 +3,10 @@ package com.yuji.contentcore.controller;
 import java.util.List;
 import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
+
+import com.yuji.common.core.utils.ServletUtils;
+import com.yuji.contentcore.domain.CmsSite;
+import com.yuji.contentcore.service.ICmsSiteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,6 +38,8 @@ public class CmsCatalogController extends BaseController
 {
     @Autowired
     private ICmsCatalogService cmsCatalogService;
+    @Autowired
+    private ICmsSiteService cmsSiteService;
 
     /**
      * 查询栏目管理列表
@@ -42,6 +48,8 @@ public class CmsCatalogController extends BaseController
     @GetMapping("/list")
     public TableDataInfo list(CmsCatalog cmsCatalog)
     {
+        CmsSite site = cmsSiteService.getCurrentSite(ServletUtils.getRequest());
+        cmsCatalog.setSiteId(site.getSiteId());
         startPage();
         List<CmsCatalog> list = cmsCatalogService.selectCmsCatalogList(cmsCatalog);
         return getDataTable(list);

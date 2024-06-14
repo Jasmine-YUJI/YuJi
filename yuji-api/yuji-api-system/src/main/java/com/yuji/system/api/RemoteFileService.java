@@ -1,9 +1,9 @@
 package com.yuji.system.api;
 
+import com.yuji.common.core.domain.StroageArgs;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import com.yuji.common.core.constant.ServiceNameConstants;
 import com.yuji.common.core.domain.R;
@@ -24,6 +24,7 @@ public interface RemoteFileService
      * @param file 文件信息
      * @return 结果
      */
-    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public R<SysFile> upload(@RequestPart(value = "file") MultipartFile file);
+    @PostMapping(value = "/upload", produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public R<SysFile> upload(@RequestPart("file") MultipartFile file, @RequestPart("stroageArgs") StroageArgs stroageArgs);
+
 }

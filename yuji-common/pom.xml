@@ -19,6 +19,7 @@
         <module>yuji-common-datascope</module>
         <module>yuji-common-datasource</module>
         <module>yuji-common-staticize</module>
+        <module>yuji-common-file</module>
     </modules>
 
     <artifactId>yuji-common</artifactId>

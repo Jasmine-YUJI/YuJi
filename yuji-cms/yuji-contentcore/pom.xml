@@ -72,6 +72,13 @@
             <artifactId>yuji-common-staticize</artifactId>
         </dependency>
 
+        <!-- YuJiCMS Common File -->
+        <dependency>
+            <groupId>com.yuji</groupId>
+            <artifactId>yuji-common-file</artifactId>
+            <version>3.6.4</version>
+        </dependency>
+
         <!-- YuJi Common Swagger -->
         <dependency>
             <groupId>com.yuji</groupId>

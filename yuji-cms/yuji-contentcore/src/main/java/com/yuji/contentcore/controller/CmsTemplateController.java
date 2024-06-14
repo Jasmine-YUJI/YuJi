@@ -65,6 +65,8 @@ public class CmsTemplateController extends BaseController
     @GetMapping("/list")
     public TableDataInfo list(CmsTemplate cmsTemplate)
     {
+        CmsSite site = cmsSiteService.getCurrentSite(ServletUtils.getRequest());
+        cmsTemplate.setSiteId(site.getSiteId());
         startPage();
         List<CmsTemplate> list = cmsTemplateService.selectCmsTemplateList(cmsTemplate);
         return getDataTable(list);
@@ -101,6 +103,9 @@ public class CmsTemplateController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody CmsTemplate cmsTemplate)
     {
+        CmsSite site = cmsSiteService.getCurrentSite(ServletUtils.getRequest());
+        cmsTemplate.setSiteId(site.getSiteId());
+        cmsTemplate.setCreateBy(SecurityUtils.getLoginUser().getUsername());
         return toAjax(cmsTemplateService.insertCmsTemplate(cmsTemplate));
     }
 

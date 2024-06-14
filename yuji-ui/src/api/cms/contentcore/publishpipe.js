@@ -17,6 +17,7 @@ export function getPublishpipe(publishpipeId) {
   })
 }
 
+
 // 新增发布通道
 export function addPublishpipe(data) {
   return request({
@@ -51,3 +52,5 @@ export function getPublishPipeSelectData(query) {
     params: query
   })
 }
+
+

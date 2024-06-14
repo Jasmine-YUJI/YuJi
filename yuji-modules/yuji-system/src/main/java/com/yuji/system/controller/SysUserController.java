@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
+
+import com.yuji.system.config.SystemConfig;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -166,6 +168,8 @@ public class SysUserController extends BaseController
     public AjaxResult getInfo()
     {
         SysUser user = userService.selectUserById(SecurityUtils.getUserId());
+        user.setAvatarSrc(SystemConfig.getResourcePrefix() + user.getAvatar());
+
         // 角色集合
         Set<String> roles = permissionService.getRolePermission(user);
         // 权限集合

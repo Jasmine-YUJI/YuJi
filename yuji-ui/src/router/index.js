@@ -107,12 +107,12 @@ export const constantRoutes = [
         name: 'CMSTemplateEditor',
         meta: { noCache: true, title: i18n.t('CMS.ContentCore.Route.EditTemplate'), activeMenu: '/configs/template'}
       },
-      // {
-      //   path: 'file/editor',
-      //   component: () => import('@/views/cms/contentcore/fileEditor'),
-      //   name: 'CMSFileEditor',
-      //   meta: { noCache: true, title: i18n.t('CMS.ContentCore.Route.EditFile'), activeMenu: '/configs/file'}
-      // },
+      {
+        path: 'file/editor',
+        component: () => import('@/views/cms/file/fileEditor'),
+        name: 'CMSFileEditor',
+        meta: { noCache: true, title: i18n.t('CMS.ContentCore.Route.EditFile'), activeMenu: '/configs/file'}
+      },
       // {
       //   path: 'content/editor',
       //   component: () => import('@/views/cms/contentcore/contentEditor'),

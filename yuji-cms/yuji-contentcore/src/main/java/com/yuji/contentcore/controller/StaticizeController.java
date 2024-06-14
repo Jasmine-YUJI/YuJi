@@ -3,6 +3,7 @@ package com.yuji.contentcore.controller;
 import com.yuji.common.core.utils.i18n.I18nUtils;
 import com.yuji.common.core.web.controller.BaseController;
 import com.yuji.common.core.domain.R;
+import com.yuji.common.security.annotation.RequiresPermissions;
 import com.yuji.common.staticize.func.IFunction;
 import com.yuji.common.staticize.tag.ITag;
 import com.yuji.contentcore.domain.vo.TemplateFuncVO;
@@ -29,16 +30,10 @@ public class StaticizeController extends BaseController {
 
 	private final List<IFunction> functions;
 
-	@GetMapping("/aa")
-	public R<?> aa() {
-
-		return R.ok(I18nUtils.get("{FREEMARKER.TAG.DESC.cms_catalog}"));
-	}
-
-
 	/**
 	 * 获取静态化自定义模板标签列表
 	 */
+	@RequiresPermissions("cms:staticize:list")
 	@GetMapping("/tags")
 	public R<?> getTemplateTags() {
 		List<TemplateTagVO> list = this.tags.stream().map(tag -> {
@@ -56,6 +51,7 @@ public class StaticizeController extends BaseController {
 	/**
 	 * 获取静态化自定义模板函数列表
 	 */
+	@RequiresPermissions("cms:staticize:list")
 	@GetMapping("/functions")
 	public R<?> getTemplateFunctions() {
 		List<TemplateFuncVO> list = this.functions.stream().map(func -> {

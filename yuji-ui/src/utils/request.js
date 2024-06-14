@@ -28,6 +28,10 @@ service.interceptors.request.use(config => {
   const isRepeatSubmit = (config.headers || {}).repeatSubmit === false
   if (getToken() && !isToken) {
     config.headers['Authorization'] = 'Bearer ' + getToken() // 让每个请求携带自定义token 请根据实际情况自行修改
+    // CMS当前站点
+    if (cache.local.get('CurrentSite')) {
+      config.headers['CurrentSite'] = cache.local.get('CurrentSite');
+    }
   }
   // get请求映射params参数
   if (config.method === 'get' && config.params) {

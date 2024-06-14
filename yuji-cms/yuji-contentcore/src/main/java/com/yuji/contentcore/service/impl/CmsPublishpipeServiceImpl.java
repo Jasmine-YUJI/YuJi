@@ -20,6 +20,7 @@ import com.yuji.contentcore.domain.CmsCatalog;
 import com.yuji.contentcore.domain.CmsContent;
 import com.yuji.contentcore.domain.CmsSite;
 import com.yuji.contentcore.exception.ContentCoreErrorCode;
+import com.yuji.contentcore.fixed.dict.EnableOrDisable;
 import com.yuji.contentcore.mapper.CmsSiteMapper;
 import com.yuji.contentcore.service.ICmsTemplateService;
 import com.yuji.contentcore.template.ITemplateType;
@@ -82,7 +83,17 @@ public class CmsPublishpipeServiceImpl implements ICmsPublishpipeService
      */
     @Override
     public List<CmsPublishpipe> getPublishPipes(Long siteId) {
-        return cmsPublishpipeMapper.getPublishPipes(siteId);
+        CmsPublishpipe cmsPublishpipe = new CmsPublishpipe();
+        cmsPublishpipe.setSiteId(siteId);
+        cmsPublishpipe.setState(EnableOrDisable.ENABLE);
+        return cmsPublishpipeMapper.selectCmsPublishpipeList(cmsPublishpipe);
+    }
+
+    @Override
+    public List<CmsPublishpipe> getAllPublishPipes(Long siteId) {
+        CmsPublishpipe cmsPublishpipe = new CmsPublishpipe();
+        cmsPublishpipe.setSiteId(siteId);
+        return cmsPublishpipeMapper.selectCmsPublishpipeList(cmsPublishpipe);
     }
 
     /**

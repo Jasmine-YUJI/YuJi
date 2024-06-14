@@ -29,8 +29,8 @@ public class CmsResource extends BaseEntity
     @Excel(name = "资源类型")
     private String resourceType;
 
-    /** 存储类型（本地=local，阿里SSO=sso） */
-    @Excel(name = "存储类型", readConverterExp = "本=地=local，阿里SSO=sso")
+    /** 存储类型（本地=local，Minio=minio） */
+    @Excel(name = "存储类型", readConverterExp = "本地=local，Minio=minio")
     private String storageType;
 
     /** 资源名称 */
@@ -51,11 +51,11 @@ public class CmsResource extends BaseEntity
 
     /** 宽 */
     @Excel(name = "宽")
-    private Long width;
+    private Integer width;
 
     /** 高 */
     @Excel(name = "高")
-    private Long height;
+    private Integer height;
 
     /** 文件大小 */
     @Excel(name = "文件大小")

@@ -225,6 +225,8 @@ export default {
       publishPipes: [],
       // 查询参数
       queryParams: {
+        pageNum: 1,
+        pageSize: 20,
         publishPipeCode: undefined,
         filename: undefined
       },
@@ -270,6 +272,7 @@ export default {
     },
     /** 搜索按钮操作 */
     handleQuery () {
+      this.queryParams.pageNum = 1;
       this.getList();
     },
     /** 重置按钮操作 */
