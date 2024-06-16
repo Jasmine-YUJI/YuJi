@@ -9,6 +9,8 @@ import com.yuji.contentcore.service.ICmsSiteService;
 import com.yuji.contentcore.utils.ResourceUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.MapUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 /**
@@ -26,7 +28,9 @@ public class InternalDataType_Resource implements IInternalDataType {
 
 	private static final String InternalUrl_Param_StorageType = "st"; // 内部链接参数：存储方式
 
-	private final ICmsSiteService cmsSiteService;
+	@Autowired
+	@Lazy
+	private ICmsSiteService cmsSiteService;
 
 	@Override
 	public String getId() {

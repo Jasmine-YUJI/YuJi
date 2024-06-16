@@ -64,6 +64,7 @@ public class CmsResourceController extends BaseController
     {
         CmsSite site = cmsSiteService.getCurrentSite(ServletUtils.getRequest());
         cmsResource.setSiteId(site.getSiteId());
+        cmsResource.setCreateBy(SecurityUtils.getUsername());
         startPage();
         List<CmsResource> list = cmsResourceService.selectCmsResourceList(cmsResource);
         if (!list.isEmpty()){

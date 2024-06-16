@@ -42,3 +42,19 @@ export function delPageWidget(pageWidgetId) {
     method: 'delete'
   })
 }
+
+export function listPageWidgetTypes() {
+  return request({
+    url: '/cms/pagewidget/types',
+    method: 'get'
+  })
+}
+
+
+export function listPageWidgets(params) {
+  return request({
+    url: '/cms/pagewidget',
+    method: 'get',
+    params: params
+  })
+}

@@ -1,16 +1,21 @@
 package com.yuji.contentcore.service.impl;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 
+import com.yuji.common.core.domain.TreeNode;
 import com.yuji.common.core.exception.CommonErrorCode;
 import com.yuji.common.core.utils.Assert;
 import com.yuji.common.core.utils.DateUtils;
 import com.yuji.common.core.utils.StringUtils;
 import com.yuji.common.core.utils.uuid.IdUtils;
+import com.yuji.contentcore.core.impl.InternalDataType_Catalog;
 import com.yuji.contentcore.domain.CmsSite;
 import com.yuji.contentcore.mapper.CmsSiteMapper;
 import com.yuji.contentcore.utils.CatalogUtils;
+import com.yuji.contentcore.utils.InternalUrlUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.yuji.contentcore.mapper.CmsCatalogMapper;
@@ -143,5 +148,25 @@ public class CmsCatalogServiceImpl implements ICmsCatalogService
     public String getCatalogListLink(CmsCatalog catalog, int pageIndex, String publishPipeCode, boolean isPreview) {
         CmsSite site = this.cmsSiteMapper.selectCmsSiteBySiteId(catalog.getSiteId());
         return CatalogUtils.getCatalogListLink(site, catalog, pageIndex, publishPipeCode, isPreview);
+    }
+
+    @Override
+    public List<TreeNode<String>> buildCatalogTreeData(List<CmsCatalog> catalogs, BiConsumer<CmsCatalog, TreeNode<String>> consumer) {
+        if (Objects.isNull(catalogs)) {
+            return List.of();
+        }
+        List<TreeNode<String>> list = catalogs.stream().map(c -> {
+            TreeNode<String> treeNode = new TreeNode<>(String.valueOf(c.getCatalogId()),
+                    String.valueOf(c.getParentId()), c.getName(), c.getParentId() == 0);
+            String internalUrl = InternalUrlUtils.getInternalUrl(InternalDataType_Catalog.ID, c.getCatalogId());
+            String logoSrc = InternalUrlUtils.getActualPreviewUrl(c.getLogo());
+            Map<String, Object> props = Map.of("path", c.getPath(), "internalUrl", internalUrl, "logo",
+                    c.getLogo() == null ? "" : c.getLogo(), "logoSrc", logoSrc == null ? "" : logoSrc, "description",
+                    c.getDescription() == null ? "" : c.getDescription());
+            treeNode.setProps(props);
+            consumer.accept(c, treeNode);
+            return treeNode;
+        }).toList();
+        return TreeNode.build(list);
     }
 }

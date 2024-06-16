@@ -1,6 +1,7 @@
 package com.yuji.contentcore.service.impl;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -31,6 +32,8 @@ import com.yuji.contentcore.properties.FileStorageArgsProperty.FileStorageArgs;
 import com.yuji.contentcore.properties.FileStorageTypeProperty;
 import com.yuji.contentcore.utils.ResourceUtils;
 import com.yuji.contentcore.utils.SiteUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.yuji.contentcore.mapper.CmsResourceMapper;
@@ -43,6 +46,7 @@ import com.yuji.contentcore.service.ICmsResourceService;
  * @author Liguoqiang
  * @date 2024-06-06
  */
+@Slf4j
 @Service
 public class CmsResourceServiceImpl implements ICmsResourceService 
 {
@@ -162,6 +166,30 @@ public class CmsResourceServiceImpl implements ICmsResourceService
     @Override
     public int deleteCmsResourceByResourceIds(Long[] resourceIds)
     {
+        List<CmsResource> resources = cmsResourceMapper.selectListByIds(resourceIds);
+        if (!resources.isEmpty()) {
+            CmsSite site = cmsSiteMapper.selectCmsSiteBySiteId(resources.get(0).getSiteId());
+            String siteRoot = SiteUtils.getSiteResourceRoot(site);
+            resources.forEach(r -> {
+                // 删除资源文件
+                try {
+                    File file = new File(siteRoot + r.getPath());
+                    FileUtils.delete(file);
+                    final String fileNamePrefix = StringUtils.substringBeforeLast(file.getName(), ".");
+                    // 删除图片缩略图
+                    File[] others = file.getParentFile().listFiles(
+                            (dir, name) -> name.startsWith(fileNamePrefix)
+                    );
+                    if (Objects.nonNull(others)) {
+                        for (File f : others) {
+                            FileUtils.delete(f);
+                        }
+                    }
+                } catch (IOException e) {
+                    log.error("Delete resource file failed: " + r.getPath());
+                }
+            });
+        }
         return cmsResourceMapper.deleteCmsResourceByResourceIds(resourceIds);
     }
 
@@ -174,6 +202,26 @@ public class CmsResourceServiceImpl implements ICmsResourceService
     @Override
     public int deleteCmsResourceByResourceId(Long resourceId)
     {
+        CmsResource resource = cmsResourceMapper.selectCmsResourceByResourceId(resourceId);
+        CmsSite site = cmsSiteMapper.selectCmsSiteBySiteId(resource.getSiteId());
+        String siteRoot = SiteUtils.getSiteResourceRoot(site);
+        // 删除资源文件
+        try {
+            File file = new File(siteRoot + resource.getPath());
+            FileUtils.delete(file);
+            final String fileNamePrefix = StringUtils.substringBeforeLast(file.getName(), ".");
+            // 删除图片缩略图
+            File[] others = file.getParentFile().listFiles(
+                    (dir, name) -> name.startsWith(fileNamePrefix)
+            );
+            if (Objects.nonNull(others)) {
+                for (File f : others) {
+                    FileUtils.delete(f);
+                }
+            }
+        } catch (IOException e) {
+            log.error("Delete resource file failed: " + resource.getPath());
+        }
         return cmsResourceMapper.deleteCmsResourceByResourceId(resourceId);
     }
 

@@ -47,6 +47,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="status != null "> and status = #{status}</if>
             <if test="usageInfo != null  and usageInfo != ''"> and usage_info = #{usageInfo}</if>
         </where>
+        order by create_time DESC
+    </select>
+
+    <select id="selectListByIds" parameterType="String" resultMap="CmsResourceResult">
+        <include refid="selectCmsResourceVo"/>
+        where resource_id in
+        <foreach item="resourceId" collection="array" open="(" separator="," close=")">
+            #{resourceId}
+        </foreach>
     </select>
     
     <select id="selectCmsResourceByResourceId" parameterType="Long" resultMap="CmsResourceResult">

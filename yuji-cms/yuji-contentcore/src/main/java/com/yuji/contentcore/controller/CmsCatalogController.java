@@ -1,21 +1,24 @@
 package com.yuji.contentcore.controller;
 
+import java.util.Comparator;
 import java.util.List;
 import java.io.IOException;
+import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
+import com.yuji.common.core.domain.TreeNode;
 import com.yuji.common.core.utils.ServletUtils;
+import com.yuji.common.core.utils.i18n.I18nUtils;
+import com.yuji.common.security.utils.SecurityUtils;
+import com.yuji.contentcore.core.ICatalogType;
+import com.yuji.contentcore.core.IContentType;
+import com.yuji.contentcore.core.impl.CatalogType_Link;
 import com.yuji.contentcore.domain.CmsSite;
 import com.yuji.contentcore.service.ICmsSiteService;
+import com.yuji.system.api.model.LoginUser;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.yuji.common.log.annotation.Log;
 import com.yuji.common.log.enums.BusinessType;
 import com.yuji.common.security.annotation.RequiresPermissions;
@@ -33,6 +36,7 @@ import com.yuji.common.core.web.page.TableDataInfo;
  * @date 2024-06-06
  */
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/catalog")
 public class CmsCatalogController extends BaseController
 {
@@ -40,6 +44,11 @@ public class CmsCatalogController extends BaseController
     private ICmsCatalogService cmsCatalogService;
     @Autowired
     private ICmsSiteService cmsSiteService;
+
+    private final List<ICatalogType> catalogTypes;
+
+    private final List<IContentType> contentTypes;
+
 
     /**
      * 查询栏目管理列表
@@ -72,7 +81,7 @@ public class CmsCatalogController extends BaseController
      * 获取栏目管理详细信息
      */
     @RequiresPermissions("cms:catalog:query")
-    @GetMapping(value = "/{catalogId}")
+    @GetMapping(value = "/getInfo/{catalogId}")
     public AjaxResult getInfo(@PathVariable("catalogId") Long catalogId)
     {
         return success(cmsCatalogService.selectCmsCatalogByCatalogId(catalogId));
@@ -109,5 +118,44 @@ public class CmsCatalogController extends BaseController
     public AjaxResult remove(@PathVariable Long[] catalogIds)
     {
         return toAjax(cmsCatalogService.deleteCmsCatalogByCatalogIds(catalogIds));
+    }
+
+    /**
+     * 内容类型数据
+     */
+    @GetMapping("/getContentTypes")
+    public AjaxResult getContentTypes() {
+        List<Map<String, String>> list = contentTypes.stream().sorted(Comparator.comparingInt(IContentType::getOrder))
+                .map(ct -> Map.of("id", ct.getId(), "name", I18nUtils.get(ct.getName()))).toList();
+        return success(list);
+    }
+
+    /**
+     * 栏目类型数据
+     */
+    @GetMapping("/getCatalogTypes")
+    public AjaxResult getCatalogTypes() {
+        List<Map<String, String>> list = this.catalogTypes.stream()
+                .map(ct -> Map.of("id", ct.getId(), "name", I18nUtils.get(ct.getName()))).toList();
+        return success(list);
+    }
+
+    /**
+     * 栏目树结构数据
+     */
+    @GetMapping("/treeData")
+    public AjaxResult treeData(@RequestParam(required = false, defaultValue = "false") Boolean disableLink) {
+        CmsSite site = cmsSiteService.getCurrentSite(ServletUtils.getRequest());
+        LoginUser loginUser = SecurityUtils.getLoginUser();
+        CmsCatalog cmsCatalog = new CmsCatalog();
+        cmsCatalog.setSiteId(site.getSiteId());
+        List<CmsCatalog> catalogs = cmsCatalogService.selectCmsCatalogList(cmsCatalog);
+
+        List<TreeNode<String>> treeData = cmsCatalogService.buildCatalogTreeData(catalogs, (catalog, node) -> {
+            if (disableLink) {
+                node.setDisabled(CatalogType_Link.ID.equals(catalog.getCatalogType()));
+            }
+        });
+        return success(Map.of("rows", treeData, "siteName", site.getName()));
     }
 }

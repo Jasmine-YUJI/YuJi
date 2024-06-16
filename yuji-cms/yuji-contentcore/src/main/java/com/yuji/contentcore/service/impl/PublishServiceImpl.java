@@ -11,6 +11,7 @@ import com.yuji.contentcore.core.impl.PublishPipeProp_ContentTemplate;
 import com.yuji.contentcore.core.impl.PublishPipeProp_DefaultListTemplate;
 import com.yuji.contentcore.domain.CmsCatalog;
 import com.yuji.contentcore.domain.CmsContent;
+import com.yuji.contentcore.domain.CmsPageWidget;
 import com.yuji.contentcore.domain.CmsSite;
 import com.yuji.contentcore.exception.ContentCoreErrorCode;
 import com.yuji.contentcore.mapper.CmsSiteMapper;
@@ -222,5 +223,36 @@ public class PublishServiceImpl implements IPublishService {
 			}
 		}
 		return detailTemplate;
+	}
+
+	@Override
+	public String getPageWidgetPageData(CmsPageWidget pageWidget, boolean isPreview)
+			throws IOException, TemplateException {
+		CmsSite site = cmsSiteMapper.selectCmsSiteBySiteId(pageWidget.getSiteId());
+		File templateFile = cmsTemplateService.findTemplateFile(site, pageWidget.getTemplate(),
+				pageWidget.getPublishPipeCode());
+		Assert.notNull(templateFile,
+				() -> ContentCoreErrorCode.TEMPLATE_EMPTY.exception(pageWidget.getName(), pageWidget.getCode()));
+
+		// 生成静态页面
+		try (StringWriter writer = new StringWriter()) {
+			long s = System.currentTimeMillis();
+			// 模板ID = 通道:站点目录:模板文件名
+			String templateKey = SiteUtils.getTemplateKey(site, pageWidget.getPublishPipeCode(),
+					pageWidget.getTemplate());
+			TemplateContext templateContext = new TemplateContext(templateKey, isPreview,
+					pageWidget.getPublishPipeCode());
+			// init template global variables
+			TemplateUtils.initGlobalVariables(site, templateContext);
+			templateContext.getVariables().put(TemplateUtils.TemplateVariable_PageWidget, pageWidget);
+			// init templateType data to datamode
+			ITemplateType templateType = cmsTemplateService.getTemplateType(SiteTemplateType.TypeId);
+			templateType.initTemplateData(site.getSiteId(), templateContext);
+			// staticize
+			this.staticizeService.process(templateContext, writer);
+			logger.debug("[{}]页面部件【{}#{}】模板解析耗时：{}ms", pageWidget.getPublishPipeCode(), pageWidget.getName(),
+					pageWidget.getCode(), System.currentTimeMillis() - s);
+			return writer.toString();
+		}
 	}
 }

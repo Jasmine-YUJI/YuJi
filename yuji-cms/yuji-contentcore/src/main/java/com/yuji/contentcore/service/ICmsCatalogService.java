@@ -1,6 +1,9 @@
 package com.yuji.contentcore.service;
 
 import java.util.List;
+import java.util.function.BiConsumer;
+
+import com.yuji.common.core.domain.TreeNode;
 import com.yuji.contentcore.domain.CmsCatalog;
 
 /**
@@ -26,6 +29,7 @@ public interface ICmsCatalogService
      * @return 栏目管理集合
      */
     public List<CmsCatalog> selectCmsCatalogList(CmsCatalog cmsCatalog);
+
 
     /**
      * 新增栏目管理
@@ -79,5 +83,13 @@ public interface ICmsCatalogService
     String getCatalogLink(CmsCatalog catalog, int pageIndex, String publishPipeCode, boolean isPreview);
 
     String getCatalogListLink(CmsCatalog catalog, int pageIndex, String publishPipeCode, boolean isPreview);
+
+    /**
+     * 构建栏目树数据
+     *
+     * @param catalogs
+     * @return
+     */
+    List<TreeNode<String>> buildCatalogTreeData(List<CmsCatalog> catalogs, BiConsumer<CmsCatalog, TreeNode<String>> consumer);
 
 }

@@ -18,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.lang3.ArrayUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
@@ -44,7 +46,9 @@ public class ResourceType_Image implements IResourceType {
 
 	public final static String[] SuffixArray = { "jpg", "jpeg", "gif", "png", "ico", "webp" };
 
-	private final ICmsSiteService siteService;
+	@Autowired
+	@Lazy
+	private ICmsSiteService siteService;
 
 	@Override
 	public String getId() {

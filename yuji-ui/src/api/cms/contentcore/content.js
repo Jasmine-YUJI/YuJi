@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 
 // 查询内容管理列表
-export function listContent(query) {
+export function getContentList(query) {
   return request({
     url: '/cms/content/list',
     method: 'get',

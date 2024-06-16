@@ -22,10 +22,19 @@ public interface CmsResourceMapper
     /**
      * 查询资源列表
      * 
+     * @param resourceIds 资源
+     * @return 资源集合
+     */
+    public List<CmsResource> selectListByIds(Long[] resourceIds);
+
+    /**
+     * 查询资源列表
+     *
      * @param cmsResource 资源
      * @return 资源集合
      */
     public List<CmsResource> selectCmsResourceList(CmsResource cmsResource);
+
 
     /**
      * 新增资源

@@ -5,6 +5,7 @@ import com.yuji.common.core.utils.StringUtils;
 import com.yuji.contentcore.core.IResourceType;
 import com.yuji.contentcore.core.impl.ResourceType_File;
 import com.yuji.contentcore.domain.CmsSite;
+import com.yuji.contentcore.properties.FileStorageArgsProperty;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -48,15 +49,14 @@ public class ResourceUtils {
         if (FileType.LOCAL.getCode().equals(storageType)) {
             return SiteUtils.getResourcePrefix(site, isPreview);
         }
-        //TODO 待解决
-        /*FileStorageArgsProperty.FileStorageArgs fileStorageArgs = FileStorageArgsProperty.getValue(site.getConfigProps());
+        FileStorageArgsProperty.FileStorageArgs fileStorageArgs = FileStorageArgsProperty.getValue(site.getConfigProps());
         if (fileStorageArgs != null && StringUtils.isNotEmpty(fileStorageArgs.getDomain())) {
             String domain = fileStorageArgs.getDomain();
             if (!domain.endsWith("/")) {
                 domain += "/";
             }
             return domain;
-        }*/
+        }
         // 无法获取到对象存储访问地址时默认使用站点资源域名
         return site.getResourceUrl();
     }

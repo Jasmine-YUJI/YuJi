@@ -22,6 +22,7 @@ import com.yuji.contentcore.exception.ContentCoreErrorCode;
 import com.yuji.contentcore.perm.SitePermissionType;
 import com.yuji.contentcore.service.ICmsSiteService;
 import com.yuji.contentcore.utils.SiteUtils;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;

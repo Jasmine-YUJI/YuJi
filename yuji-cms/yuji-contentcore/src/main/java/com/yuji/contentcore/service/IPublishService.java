@@ -2,6 +2,7 @@ package com.yuji.contentcore.service;
 
 import com.yuji.contentcore.domain.CmsCatalog;
 import com.yuji.contentcore.domain.CmsContent;
+import com.yuji.contentcore.domain.CmsPageWidget;
 import com.yuji.contentcore.domain.CmsSite;
 import freemarker.template.TemplateException;
 
@@ -142,7 +143,8 @@ public interface IPublishService {
     String getContentExPageData(CmsContent content, String publishPipeCode, boolean isPreview)
             throws IOException, TemplateException;
 
-    *//**
+    */
+    /**
      * 获取页面部件模板解析内容
      *
      * @param pageWidget
@@ -150,10 +152,10 @@ public interface IPublishService {
      * @return
      * @throws IOException
      * @throws TemplateException
-     *//*
+     */
     String getPageWidgetPageData(CmsPageWidget pageWidget, boolean isPreview) throws IOException, TemplateException;
 
-    *//**
+    /**
      * 页面部件静态化
      *
      * @param pageWidget

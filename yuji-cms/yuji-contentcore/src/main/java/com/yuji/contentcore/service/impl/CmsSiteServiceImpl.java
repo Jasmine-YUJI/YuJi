@@ -14,6 +14,7 @@ import com.yuji.contentcore.ContentCoreConsts;
 import com.yuji.contentcore.exception.ContentCoreErrorCode;
 import com.yuji.contentcore.perm.SitePermissionType.SitePrivItem;
 import com.yuji.system.api.model.LoginUser;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.yuji.contentcore.mapper.CmsSiteMapper;
@@ -29,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
  * @date 2024-06-06
  */
 @Service
+@RequiredArgsConstructor
 public class CmsSiteServiceImpl implements ICmsSiteService 
 {
     @Autowired

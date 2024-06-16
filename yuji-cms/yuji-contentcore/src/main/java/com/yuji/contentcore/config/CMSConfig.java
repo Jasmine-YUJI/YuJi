@@ -6,6 +6,7 @@ import com.yuji.common.core.utils.file.FileTypeUtils;
 import com.yuji.common.redis.service.RedisService;
 import com.yuji.contentcore.ContentCoreConsts;
 import com.yuji.contentcore.config.properties.CMSProperties;
+import com.yuji.contentcore.fixed.config.BackendContext;
 import freemarker.cache.FileTemplateLoader;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -80,9 +81,7 @@ public class CMSConfig implements WebMvcConfigurer {
 	}
 
 	public static String getResourcePreviewPrefix() {
-		//TODO 待解决
-		//return BackendContext.getValue() + ContentCoreConsts.RESOURCE_PREVIEW_PREFIX;
-		return "http://localhost/dev-api/" + ContentCoreConsts.RESOURCE_PREVIEW_PREFIX;
+		return BackendContext.getValue() + "cms/"+ ContentCoreConsts.RESOURCE_PREVIEW_PREFIX;
 	}
 
 	@Override
